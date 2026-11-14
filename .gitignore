@@ -1,0 +1,6 @@
+.cache_sudoc/
+__pycache__/
+*.pyc
+resultats_*.csv
+rapport_*.html
+.~lock.*#
