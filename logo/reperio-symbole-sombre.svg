@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Repério">
+<title>Repério</title>
+<g transform="translate(0 0)">
+  <path d="M60 116C52 104 18 76 18 48a42 42 0 0 1 84 0c0 28-34 56-42 68z" fill="#79a8d8"/>
+  <rect x="37" y="30" width="11" height="38" rx="1.5" fill="#16181c"/>
+  <rect x="37" y="36" width="11" height="2.5" fill="#79a8d8"/>
+  <rect x="37" y="58" width="11" height="2.5" fill="#79a8d8"/>
+  <rect x="51" y="24" width="11" height="44" rx="1.5" fill="#16181c"/>
+  <rect x="51" y="30" width="11" height="2.5" fill="#79a8d8"/>
+  <rect x="51" y="58" width="11" height="2.5" fill="#79a8d8"/>
+  <g transform="rotate(16 66 68)">
+    <rect x="66" y="30" width="11" height="38" rx="1.5" fill="#e8ab45"/>
+    <rect x="66" y="36" width="11" height="2.5" fill="#79a8d8"/>
+    <rect x="66" y="58" width="11" height="2.5" fill="#79a8d8"/>
+  </g>
+  <rect x="33" y="68" width="56" height="5" rx="2.5" fill="#16181c"/>
+</g>
+</svg>

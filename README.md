@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="logo/reperio-logo-sombre.svg">
+    <img src="logo/reperio-logo.svg" alt="Repério" width="340">
+  </picture>
+</p>
+
 # Repério : localiser une revue dans les BU françaises pour le PEB
 
 Repério (*repérer* + *périodique*) est une preuve de concept. Elle répond à une question : pour une revue et une année, où la trouver ? Elle enchaîne quatre étapes, chacune correspondant à une phase du plan.
@@ -58,6 +65,7 @@ Mettre à jour l'index pour les collègues : `python peb_nantes.py --indexer <no
 | `peb_acces.py` | Libre accès, Licences nationales, ISTEX |
 | `peb_resolveurs.py` | Résolveurs Alma des BU prioritaires |
 | `web/` | Page de test (GitHub Pages) : interface, worker Pyodide |
+| `logo/` | Logo (SVG fixes, animé, favicon) et `generer_logo.py` qui les régénère |
 | `resolveurs.csv` | Table de configuration des résolveurs, une ligne par BU prioritaire |
 | `bu-prio.csv` | Liste des BU prioritaires transmise par l'équipe PEB |
 

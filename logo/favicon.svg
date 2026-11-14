@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Repério">
+<title>Repério</title>
+<rect width="32" height="32" rx="7" fill="#2f5d8a"/>
+<rect x="7" y="8" width="5" height="15" rx=".8" fill="#fbfaf7"/>
+<rect x="13.5" y="6" width="5" height="17" rx=".8" fill="#fbfaf7"/>
+<rect x="20" y="8" width="5" height="15" rx=".8" fill="#e3a33b" transform="rotate(16 20 23)"/>
+<rect x="5.5" y="23" width="21" height="3" rx="1.5" fill="#fbfaf7"/>
+</svg>

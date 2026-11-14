@@ -1,18 +1,18 @@
 :root {
   --bg: #fbfaf7; --fg: #1f2328; --muted: #5f6670; --line: #e3e1db; --card: #fff;
-  --accent: #2f5d8a; --accent-fg: #fff; --ok: #1a7f37; --bad: #b42318; --chip: #f0eee8;
+  --accent: #2f5d8a; --accent-fg: #fff; --ambre: #e3a33b; --ambre-texte: #b06a0b; --ok: #1a7f37; --bad: #b42318; --chip: #f0eee8;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #16181c; --fg: #e6e6e3; --muted: #9aa0a8; --line: #30343b; --card: #1d2026;
-    --accent: #79a8d8; --accent-fg: #10161d; --ok: #56c271; --bad: #ff7b72; --chip: #272b32;
+    --accent: #79a8d8; --accent-fg: #10161d; --ambre: #e8ab45; --ambre-texte: #e8ab45; --ok: #56c271; --bad: #ff7b72; --chip: #272b32;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #16181c; --fg: #e6e6e3; --muted: #9aa0a8; --line: #30343b; --card: #1d2026;
-  --accent: #79a8d8; --accent-fg: #10161d; --ok: #56c271; --bad: #ff7b72; --chip: #272b32;
+  --accent: #79a8d8; --accent-fg: #10161d; --ambre: #e8ab45; --ambre-texte: #e8ab45; --ok: #56c271; --bad: #ff7b72; --chip: #272b32;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -20,6 +20,11 @@ body { margin: 0; background: var(--bg); color: var(--fg);
   font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
 main { max-width: 1200px; margin: 0 auto; padding: 28px 16px 48px; }
 h1 { font-size: 1.6rem; margin: 0 0 4px; }
+/* Logo animé (logo/reperio-logo-anime.svg) : au survol, « Repér io » (repère) puis « Re pério » (périodique) */
+h1.logo { margin: 0 0 8px; line-height: 0; }
+h1.logo svg { height: 72px; width: auto; max-width: 100%; }
+:root .reperio { --rp-bleu: var(--accent); --rp-papier: var(--bg); --rp-ambre: var(--ambre);
+  --rp-ambre-texte: var(--ambre-texte); --rp-texte: var(--fg); --rp-muet: var(--muted); }
 h2 { font-size: 1.1rem; margin: 0 0 10px; }
 .sous { color: var(--muted); margin: 0 0 22px; max-width: 70ch; }
 .carte { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
