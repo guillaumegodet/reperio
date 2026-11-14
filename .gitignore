@@ -4,3 +4,4 @@ __pycache__/
 resultats_*.csv
 rapport_*.html
 .~lock.*#
+donnees/

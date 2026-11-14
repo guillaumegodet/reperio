@@ -3,6 +3,7 @@
 reperio.py — Repério : pour une revue et une année, où la trouver pour le PEB ?
 
 Enchaîne :
+    étape 0  déjà accessible à Nantes Université ? (export HLM du catalogue Nantilus, peb_nantes.py)
     phase 2  accès sans PEB : libre accès (OpenAlex, DOAJ), Licences nationales (BACON), ISTEX
     phase 1  états de collection du Sudoc (papier et électronique)
     phase 3  résolveurs de liens des BU prioritaires (resolveurs.csv)
@@ -14,7 +15,7 @@ Usage :
     options : --sans-hopitaux  --sans-cache  --sortie fichier.csv  --html fichier.html
 """
 import argparse, csv, datetime, html, os, sys, time
-import peb_sudoc, peb_acces, peb_resolveurs
+import peb_sudoc, peb_acces, peb_resolveurs, peb_nantes
 
 ICI = os.path.dirname(os.path.abspath(__file__))
 COLONNES = ["demande", "annee", "statut", "confiance", "bibliotheque", "type", "rcr", "prioritaire",
@@ -55,11 +56,13 @@ def cle_tri(l):
 def traiter(libelle, issns, annee, sans_hopitaux, prio):
     t0 = time.time()
     tous_issns = peb_sudoc.issns_utiles(issns, annee)
+    verdict_nantes, nantes = peb_nantes.evaluer(libelle, tous_issns, annee)
     verdict, acces = peb_acces.evaluer(libelle, tous_issns, annee)
     sudoc = lignes_sudoc(libelle, issns, annee, sans_hopitaux, prio)
     resolveurs, etat = peb_resolveurs.interroger(libelle, tous_issns, annee)
     localisations = sorted(sudoc + resolveurs, key=cle_tri)
-    return {"libelle": libelle, "annee": annee, "issns": tous_issns, "verdict": verdict,
+    return {"libelle": libelle, "annee": annee, "issns": tous_issns, "verdict_nantes": verdict_nantes,
+            "nantes": nantes, "verdict": verdict,
             "acces": acces, "localisations": localisations, "etat": etat,
             "duree": time.time() - t0}
 
@@ -75,7 +78,7 @@ CSS = """
 main{max-width:1200px;margin:0 auto;padding:24px 16px 64px}h1{font-size:1.5rem;margin:0 0 4px}
 .sous{color:var(--muted);margin:0 0 20px}
 section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:0 0 24px}
-h2{font-size:1.15rem;margin:0 0 6px}.issn{color:var(--muted);font-size:.85rem}
+h2{font-size:1.15rem;margin:0 0 6px}h3{font-size:1rem;margin:14px 0 6px}.issn{color:var(--muted);font-size:.85rem}
 .verdict{border-radius:8px;padding:10px 14px;margin:12px 0}.verdict.ok{background:var(--okbg);color:var(--ok)}
 .verdict.peb{background:var(--warnbg);color:var(--warn)}
 .resume{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.chip{background:var(--chip);border-radius:999px;padding:2px 10px;font-size:.85rem}
@@ -111,7 +114,7 @@ def rapport_html(resultats, chemin):
     parts = [f"<!doctype html><html lang='fr'><head><meta charset='utf-8'>"
              f"<meta name='viewport' content='width=device-width,initial-scale=1'><title>Repério</title>"
              f"<style>{CSS}</style></head><body><main><h1>Repério — localisations pour le PEB</h1>"
-             f"<p class='sous'>Généré le {datetime.datetime.now():%d/%m/%Y à %H:%M} · sources : Sudoc, "
+             f"<p class='sous'>Généré le {datetime.datetime.now():%d/%m/%Y à %H:%M} · sources : {_e(peb_nantes.etat()[1])}, Sudoc, "
              f"résolveurs Alma des BU prioritaires, OpenAlex, BACON, ISTEX. "
              f"Bordure bleue = BU prioritaire. Confiance : <b>haute</b> = état fermé ou résolveur à jour ; "
              f"<b>moyenne</b> = état ouvert à confirmer ; <b>faible</b> = douteux.</p>"]
@@ -122,10 +125,22 @@ def rapport_html(resultats, chemin):
         papier = sum(l["support"] == "papier" for l in locs)
         parts.append(f"<section><h2>{_e(r['libelle'])} — {r['annee']}</h2>"
                      f"<div class='issn'>ISSN interrogés : {_e(', '.join(r['issns']))}</div>")
+        if r["verdict_nantes"]:
+            parts.append(f"<div class='verdict ok'><b>Déjà accessible à Nantes Université, pas de PEB :</b> "
+                         f"{_e(r['verdict_nantes'][len('accessible à Nantes Université : '):])}</div>")
         if r["verdict"]:
             parts.append(f"<div class='verdict ok'><b>Accessible sans PEB probable :</b> {_e(r['verdict'])}</div>")
-        else:
+        elif not r["verdict_nantes"]:
             parts.append("<div class='verdict peb'><b>Pas d'accès libre ou national trouvé</b> → PEB</div>")
+        if r["nantes"]:
+            parts.append("<h3>Ressources électroniques de Nantes Université</h3><div class='tab'><table><thead><tr>"
+                         "<th>Bouquet</th><th>Statut</th><th>Confiance</th><th>Couverture</th><th>Accès</th>"
+                         "<th>Détail</th></tr></thead><tbody>")
+            for l in r["nantes"]:
+                parts.append(f"<tr><td>{_e(l['bibliotheque'].split(' — ', 1)[-1])}</td><td>{_e(l['statut'])}</td>"
+                             f"<td class='c-{_e(l['confiance'])}'>{_e(l['confiance'])}</td><td>{_e(l['couverture'])}</td>"
+                             f"<td>{_lien(dict(l, source='Nantilus'))}</td><td class='muted'>{_e(l['detail'])}</td></tr>")
+            parts.append("</tbody></table></div>")
         parts.append(f"<div class='resume'><span class='chip'>{len(locs)} localisations</span>"
                      f"<span class='chip'>{sures} sûres</span><span class='chip'>{papier} papier</span>"
                      f"<span class='chip'>{prios} BU prioritaires</span>"
@@ -193,6 +208,7 @@ def main():
             resultats.append(r)
             locs = r["localisations"]
             print(f"\n== {libelle} — {annee}  ({r['duree']:.0f} s)")
+            print("   Nantes :", r["verdict_nantes"] or "pas d'accès électronique trouvé")
             print("   Accès sans PEB :", r["verdict"] or "non trouvé")
             print(f"   {len(locs)} localisations, {sum(l['confiance'] == 'haute' for l in locs)} sûres, "
                   f"{sum(l['prioritaire'] == 'oui' for l in locs)} en BU prioritaire")
@@ -203,6 +219,7 @@ def main():
         w = csv.DictWriter(f, fieldnames=COLONNES, delimiter=";", extrasaction="ignore")
         w.writeheader()
         for r in resultats:
+            w.writerows(r["nantes"])
             w.writerows(r["acces"])
             w.writerows(r["localisations"])
     rapport_html(resultats, a.html)

@@ -1,5 +1,5 @@
 rcr;bibliotheque;ville;etablissement;type;hote;institution;statut;remarque;filtre_paquet
-441092101;BU Santé;Nantes;Nantes Université;inconnu;;;à identifier;Catalogue VuFind (Nantilus) : résolveur à identifier (fonds propres de Nantes, utile pour éviter un PEB inutile);
+441092101;BU Santé;Nantes;Nantes Université;hlm;;;actif;Ressources électroniques : export EBSCO HLM du catalogue Nantilus (peb_nantes.py) ; le papier vient du Sudoc;
 693882213;BU Odontologie;Lyon;Université Lyon 1;ebsco;;gx5tqd;non interrogeable;EBSCO Discovery : authentification requise;
 693882101;BU Santé Lyon Sud / Rockefeller;Lyon;Université Lyon 1;ebsco;;gx5tqd;non interrogeable;Même RCR pour Lyon Sud et Rockefeller ; EBSCO Discovery : authentification requise;
 543952103;BU Santé;Vandœuvre-lès-Nancy;Université de Lorraine;alma;eu01;33UDL_INST;actif;Résolveur Alma public;

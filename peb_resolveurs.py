@@ -4,6 +4,7 @@ peb_resolveurs.py — Phase 3 : interroger les résolveurs de liens des BU prior
 
 La table resolveurs.csv décrit chaque BU : type de résolveur, hôte, code institution.
 Seuls les résolveurs Alma publics (statut « actif ») sont interrogés pour l'instant.
+Le type « hlm » (Nantes) n'est pas un résolveur : il renvoie à l'index local de peb_nantes.py.
 
 Usage :
     python peb_resolveurs.py --issn 0002-9343 1555-7162 --annee 2020
@@ -15,6 +16,7 @@ Requête Alma (OpenURL, réponse XML) :
 import argparse, csv, datetime, os, re, sys, urllib.parse
 import xml.etree.ElementTree as ET
 from peb_sudoc import get
+import peb_nantes
 
 ICI = os.path.dirname(os.path.abspath(__file__))
 CONFIG = os.path.join(ICI, "resolveurs.csv")
@@ -94,6 +96,10 @@ def interroger(libelle, issns, annee, config=None):
     lignes, etat = [], {}
     deja = set()       # un même résolveur (ex. Montpellier) peut servir plusieurs BU
     for conf in config:
+        if conf["type"] == "hlm":      # lignes produites par peb_nantes.evaluer, appelé par reperio.py
+            ok, txt = peb_nantes.etat()
+            etat[conf["rcr"]] = "interrogé" if ok else txt
+            continue
         if conf["type"] != "alma" or conf["statut"] != "actif":
             etat[conf["rcr"]] = conf["statut"]
             continue
@@ -135,6 +141,11 @@ def interroger(libelle, issns, annee, config=None):
 def tester():
     ok = True
     for conf in charger_config():
+        if conf["type"] == "hlm":
+            dispo, txt = peb_nantes.etat()
+            ok &= dispo
+            print(f"  {conf['rcr']} {conf['etablissement']:<40} {'index local':<16} {txt}")
+            continue
         if conf["type"] != "alma" or conf["statut"] != "actif":
             print(f"  {conf['rcr']} {conf['etablissement']:<40} {conf['statut']}")
             continue
