@@ -107,6 +107,8 @@ python peb_resolveurs.py --test
 
 ## Lire les résultats
 
+Les liens ouvrent des pages publiques, sans connexion : la recherche par ISSN dans le catalogue de la BU (Primo pour les résolveurs Alma, Nantilus pour Nantes), la notice du Sudoc, le site de l'éditeur, ISTEX ou Mir@bel. Les liens fournis par les résolveurs passent par le proxy et le CAS de chaque établissement : ils ne servent pas à un collègue extérieur. Les adresses des catalogues sont dans la colonne `catalogue` de `resolveurs.csv`, avec `{issn}` à la place de l'ISSN.
+
 ### Niveaux de confiance
 
 | Confiance | Signification |

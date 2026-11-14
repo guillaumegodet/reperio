@@ -90,6 +90,14 @@ def alma(conf, issn, annee):
     return services
 
 
+def lien_catalogue(conf, issn):
+    """Recherche par ISSN dans le catalogue public de la BU (colonne « catalogue » de resolveurs.csv).
+    Les liens du résolveur passent par le proxy et le CAS de l'établissement : inutilisables
+    pour un collègue extérieur, alors que le catalogue s'affiche sans connexion."""
+    modele = (conf.get("catalogue") or "").strip()
+    return modele.replace("{issn}", urllib.parse.quote(issn)) if modele else ""
+
+
 def interroger(libelle, issns, annee, config=None):
     """Lignes au format commun pour toutes les BU actives de la configuration."""
     config = config or charger_config()
@@ -109,7 +117,7 @@ def interroger(libelle, issns, annee, config=None):
             r = alma(conf, issn, annee)
             if r is not None:
                 repondu = True
-                services += r
+                services += [dict(s, issn=issn) for s in r]
         etat[conf["rcr"]] = "interrogé" if repondu else "pas de réponse"
         # Une ligne par BU : les bouquets qui couvrent l'année sont regroupés
         couvrants = {}
@@ -132,7 +140,7 @@ def interroger(libelle, issns, annee, config=None):
                 "peb": "clause PEB à vérifier" + (" (licence enregistrée)" if any(s["licence"] for s in ss) else ""),
                 "source": f"résolveur Alma {conf['institution']}",
                 "detail": " ; ".join(couvrants) + (" — même résolveur qu'une autre BU" if cle_res in deja else ""),
-                "url": ss[0]["url"],
+                "url": lien_catalogue(conf, ss[0]["issn"]) or ss[0]["url"],
             })
         deja.add(cle_res)
     return lignes, etat

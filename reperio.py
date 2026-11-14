@@ -134,7 +134,7 @@ def rapport_html(resultats, chemin):
             parts.append("<div class='verdict peb'><b>Pas d'accès libre ou national trouvé</b> → PEB</div>")
         if r["nantes"]:
             parts.append("<h3>Ressources électroniques de Nantes Université</h3><div class='tab'><table><thead><tr>"
-                         "<th>Bouquet</th><th>Statut</th><th>Confiance</th><th>Couverture</th><th>Accès</th>"
+                         "<th>Bouquet</th><th>Statut</th><th>Confiance</th><th>Couverture</th><th>Catalogue</th>"
                          "<th>Détail</th></tr></thead><tbody>")
             for l in r["nantes"]:
                 parts.append(f"<tr><td>{_e(l['bibliotheque'].split(' — ', 1)[-1])}</td><td>{_e(l['statut'])}</td>"

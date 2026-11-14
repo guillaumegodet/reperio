@@ -28,6 +28,8 @@ from itertools import zip_longest
 
 ICI = os.path.dirname(os.path.abspath(__file__))
 INDEX = os.environ.get("REPERIO_INDEX_NANTES", os.path.join(ICI, "donnees", "fonds_nantes.json.gz"))
+# Lien public (recherche par ISSN dans Nantilus) : les URL de l'export passent par le proxy et le CAS
+CATALOGUE = "https://nantilus.univ-nantes.fr/vufind/Search/Results?lookfor={issn}&type=ISN"
 RCR = "441092101"                 # BU Santé de Nantes, ligne de resolveurs.csv servie par cet index
 ETABLISSEMENT = "Nantes Université"
 EXPORT_ANCIEN = 120               # jours : au-delà, le rapport signale un export à rafraîchir
@@ -85,7 +87,7 @@ def indexer(chemin_hlm, date_export=None, sortie=INDEX):
                 "embargo": (r.get("CustomEmbargo") or r.get("Embargo") or "").strip(),
                 "nature": nature(paquet, (r.get("UserDefinedField4") or "").strip(), contenu),
                 "agrege": contenu == "AggregatedFullText",
-                "url": (r.get("ProxiedURL") or r.get("URL") or "").strip(),
+                "url": (r.get("URL") or "").strip(),       # adresse directe, sans le proxy
             })
             for i in issns:
                 par_issn.setdefault(i, []).append(len(lignes) - 1)
@@ -208,7 +210,7 @@ def evaluer(libelle, issns, annee):
             if i in vus:
                 continue
             vus.add(i)
-            l = idx["lignes"][i]
+            l = dict(idx["lignes"][i], issn=issn)
             couvre, partielle, txt = couverture(l, int(annee))
             (couvrantes if couvre else hors).append((l, partielle, txt))
 
@@ -219,7 +221,8 @@ def evaluer(libelle, issns, annee):
                        "bibliotheque": f"{ETABLISSEMENT} — {l['paquet']}", "type": "accès en ligne",
                        "rcr": RCR, "prioritaire": "Nantes", "support": "électronique",
                        "couverture": txt, "peb": "sans objet (accès direct NU)",
-                       "source": source, "detail": detail, "url": l["url"]})
+                       "source": source, "detail": detail,
+                       "url": CATALOGUE.replace("{issn}", l["issn"].strip())})
 
     for l, partielle, txt in couvrantes:
         douteux = partielle or l["agrege"]
