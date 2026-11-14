@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Repério</title>
+<meta name="description" content="Localiser une revue et une année pour le PEB : fonds de Nantes Université, accès libre ou national, Sudoc, résolveurs des BU.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5d8a'/%3E%3Cpath d='M9 8h4v16H9zM15 8h4v16h-4zM21.5 8.6l3.8 1.1-4.3 15.4-3.8-1.1z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1>Repério</h1>
+    <p class="sous">Pour une revue et une année : déjà à Nantes ? en accès libre ou national ? sinon, quelles BU l'ont, en papier ou en ligne ?</p>
+  </header>
+
+  <section class="carte" id="carte-index" aria-labelledby="t-index">
+    <h2 id="t-index">Ressources électroniques de Nantes Université</h2>
+    <p class="etat" id="etat-index">Chargement de Repério…</p>
+    <div class="actions">
+      <label class="bouton secondaire" id="lbl-index">
+        <input type="file" id="fichier-index" accept=".gz,application/gzip" hidden>
+        Charger l'index…
+      </label>
+      <button type="button" class="lien" id="retirer-index" hidden>Retirer l'index</button>
+    </div>
+    <p class="aide">Fichier <code>fonds_nantes.json.gz</code> du dossier partagé Uncloud de Repério. Il reste dans ce navigateur et n'est envoyé nulle part. Sans lui, Repério ne vérifie pas les abonnements de Nantes.</p>
+  </section>
+
+  <section class="carte" aria-labelledby="t-demande">
+    <h2 id="t-demande">Demande</h2>
+    <div class="onglets" role="tablist">
+      <button type="button" role="tab" id="o-une" aria-selected="true" aria-controls="p-une">Une revue</button>
+      <button type="button" role="tab" id="o-liste" aria-selected="false" aria-controls="p-liste">Une liste</button>
+    </div>
+    <form id="formulaire" novalidate>
+      <div role="tabpanel" id="p-une" aria-labelledby="o-une">
+        <div class="champs">
+          <label>ISSN <span class="muet">(un seul suffit)</span>
+            <input id="issn" inputmode="text" autocomplete="off" placeholder="0008-6568" spellcheck="false"></label>
+          <label>Année(s)
+            <input id="annee" autocomplete="off" placeholder="2016, 2016 2018 ou 2016-2018"></label>
+          <label class="large">Titre <span class="muet">(facultatif, pour le rapport)</span>
+            <input id="libelle" autocomplete="off" placeholder="Caries research"></label>
+        </div>
+      </div>
+      <div role="tabpanel" id="p-liste" aria-labelledby="o-liste" hidden>
+        <label>Une demande par ligne : <code>titre;issn;année</code>, ou copier-coller de trois colonnes depuis Excel
+          <textarea id="liste" rows="6" spellcheck="false" placeholder="La Presse médicale;0755-4982;2023&#10;Caries research;0008-6568;2016"></textarea></label>
+        <label class="bouton secondaire petit">
+          <input type="file" id="fichier-liste" accept=".csv,.txt,text/csv,text/plain" hidden>
+          Importer un fichier CSV…
+        </label>
+      </div>
+      <div class="options">
+        <label><input type="checkbox" id="sans-hopitaux"> Exclure les centres hospitaliers</label>
+        <label><input type="checkbox" id="sans-cache"> Ignorer les réponses gardées en cache</label>
+      </div>
+      <p class="erreur" id="erreur-form" role="alert" hidden></p>
+      <button type="submit" class="bouton" id="lancer" disabled>Chercher</button>
+    </form>
+  </section>
+
+  <section class="carte" id="carte-suivi" hidden aria-live="polite">
+    <p class="etat" id="avancement"></p>
+    <details id="details-journal"><summary>Journal</summary><pre id="journal"></pre></details>
+  </section>
+
+  <section id="resultats" hidden>
+    <div class="barre">
+      <h2>Résultats</h2>
+      <div class="actions">
+        <button type="button" class="bouton secondaire" id="dl-csv">Télécharger le tableau (CSV)</button>
+        <button type="button" class="bouton secondaire" id="dl-html">Télécharger le rapport</button>
+      </div>
+    </div>
+    <iframe id="rapport" title="Rapport Repério"></iframe>
+  </section>
+
+  <footer>
+    <p>Preuve de concept, en test à Nantes Université. Sources : export du catalogue Nantilus, Sudoc et BACON (ABES), ISTEX, OpenAlex, <a href="https://reseau-mirabel.info">Mir@bel</a> (Licence Ouverte), résolveurs Alma des BU prioritaires. Chaque recherche prend 10 à 30 secondes. Code : <a href="https://github.com/guillaumegodet/reperio">github.com/guillaumegodet/reperio</a>.</p>
+  </footer>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

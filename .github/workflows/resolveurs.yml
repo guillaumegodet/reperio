@@ -1,0 +1,21 @@
+# Chaque mois, vérifie que les résolveurs Alma des BU prioritaires répondent toujours.
+# En cas d'échec, GitHub prévient le propriétaire du dépôt par courriel.
+name: Test des résolveurs
+
+on:
+  schedule:
+    - cron: "0 6 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tester:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python peb_resolveurs.py --test

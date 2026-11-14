@@ -142,8 +142,7 @@ def tester():
     ok = True
     for conf in charger_config():
         if conf["type"] == "hlm":
-            dispo, txt = peb_nantes.etat()
-            ok &= dispo
+            _, txt = peb_nantes.etat()      # index local : son absence (ex. en CI) n'est pas un échec
             print(f"  {conf['rcr']} {conf['etablissement']:<40} {'index local':<16} {txt}")
             continue
         if conf["type"] != "alma" or conf["statut"] != "actif":

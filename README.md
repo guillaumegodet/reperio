@@ -34,6 +34,20 @@ Options :
 - `--sans-hopitaux` : exclure les centres hospitaliers ;
 - `--sans-cache` : ignorer le cache. Par défaut, les réponses sont gardées une semaine dans `.cache_sudoc/`.
 
+## Page web de test
+
+La même chaîne tourne dans le navigateur, sans rien installer : https://guillaumegodet.github.io/reperio/
+
+- Le code Python du dépôt s'exécute dans la page grâce à [Pyodide](https://pyodide.org) (environ 10 Mo téléchargés à la première visite). Les requêtes partent du navigateur : le Sudoc, BACON, ISTEX, OpenAlex, Mir@bel et les résolveurs Alma l'autorisent tous (en-têtes CORS).
+- Le cache des réponses (une semaine) est gardé dans le navigateur.
+- **L'index des fonds de Nantes n'est pas publié** (le dépôt et la page sont publics). Chaque collègue récupère `fonds_nantes.json.gz` dans le dossier partagé Uncloud de Repério et le charge une fois dans la page ; il reste dans son navigateur. Le lien du dossier Uncloud circule par courriel, jamais dans ce dépôt.
+- La clé d'API OpenAlex n'est jamais envoyée par la page.
+- La page est publiée par `.github/workflows/pages.yml` à chaque push sur `main` (dossier `web/` + modules Python copiés dans `py/`).
+
+Pour l'essayer en local : copier `web/*` dans un dossier, les fichiers `peb_*.py`, `reperio.py` et `resolveurs.csv` dans son sous-dossier `py/`, puis `python -m http.server` dans ce dossier.
+
+Mettre à jour l'index pour les collègues : `python peb_nantes.py --indexer <nouvel export HLM>`, puis remplacer `donnees/fonds_nantes.json.gz` dans le dossier Uncloud. La page affiche la date de l'export.
+
 ## Fichiers
 
 | Fichier | Rôle |
@@ -43,6 +57,7 @@ Options :
 | `peb_sudoc.py` | Sudoc : états de collection, liens entre supports et titres, codes PEB de la zone 930 $j |
 | `peb_acces.py` | Libre accès, Licences nationales, ISTEX |
 | `peb_resolveurs.py` | Résolveurs Alma des BU prioritaires |
+| `web/` | Page de test (GitHub Pages) : interface, worker Pyodide |
 | `resolveurs.csv` | Table de configuration des résolveurs, une ligne par BU prioritaire |
 | `bu-prio.csv` | Liste des BU prioritaires transmise par l'équipe PEB |
 
@@ -140,4 +155,4 @@ Les BU non interrogées automatiquement restent couvertes par le Sudoc.
 - **Repérage des hôpitaux :** il se fait d'après le nom court de la bibliothèque et devra être affiné.
 - **Dates de publication :** beaucoup de notices de périodiques n'ont pas de zone 100. Les dates des titres liés sont alors estimées à partir de leurs successeurs ou prédécesseurs.
 - **Export Nantilus :** il n'est pas mis à jour automatiquement. Un abonnement arrêté après l'export apparaît encore « en cours ». La base de connaissances décrit ce que Nantes déclare, pas les droits réels ; les écarts se vérifient sur le jeu de test.
-- **OpenAlex sans clé :** sans clé d'API, le budget quotidien est partagé entre tous les utilisateurs du réseau. Une clé gratuite sera utile en production.
+- **Clé OpenAlex :** sans clé, le budget quotidien est partagé entre tous les utilisateurs du réseau. En ligne de commande, Repério lit `OPENALEX_API_KEY` dans l'environnement ou dans un fichier `.env` à la racine du dépôt (ignoré par git). La page web n'en utilise jamais : la clé y serait visible de tous.

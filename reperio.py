@@ -178,6 +178,72 @@ def rapport_html(resultats, chemin):
         f.write("".join(parts))
 
 
+def lire_demandes(lignes):
+    """Demandes « libelle;issn;annee » : point-virgule, ou tabulation (copier-coller depuis Excel).
+    L'en-tête est facultatif ; sans en-tête, une ligne de 2 colonnes se lit « issn;annee ».
+    Renvoie [(libellé, [issn], [années])]."""
+    lignes = [l.lstrip("\ufeff") for l in (x.rstrip("\r\n") for x in lignes) if l.strip()]
+    if not lignes:
+        return []
+    sep = "\t" if "\t" in lignes[0] else ";"
+    rangs = list(csv.reader(lignes, delimiter=sep))
+    entete = [c.strip().lower() for c in rangs[0]]
+    if "issn" in entete and "annee" in entete:
+        rangs = [dict(zip(entete, r)) for r in rangs[1:]]
+    else:
+        lues = []
+        for r in rangs:
+            cellules = [c for c in r if c.strip()]
+            cles = ("issn", "annee") if len(cellules) == 2 else ("libelle", "issn", "annee")
+            lues.append(dict(zip(cles, cellules if len(cellules) == 2 else r)))
+        rangs = lues
+    demandes = []
+    for n, r in enumerate(rangs, 1):
+        r = {k: (v or "").strip() for k, v in r.items()}
+        issns = r.get("issn", "").replace(",", " ").split()
+        try:
+            annees = peb_sudoc.lire_annees(r.get("annee", ""))
+        except ValueError:
+            annees = []
+        if not (issns and annees):
+            print(f"Ligne {n} ignorée (ISSN ou année illisible) : {sep.join(r.values())}", flush=True)
+            continue
+        demandes.append((r.get("libelle") or " / ".join(issns), issns, annees))
+    return demandes
+
+
+def executer(demandes, sans_hopitaux=False):
+    """Traite toutes les demandes ; affiche l'avancement au fil de l'eau."""
+    prio = rcr_prioritaires()
+    resultats = []
+    total = sum(len(annees) for _, _, annees in demandes)
+    for libelle, issns, annees in demandes:
+        for annee in annees:
+            print(f"\n[{len(resultats) + 1}/{total}] {libelle} — {annee} : recherche…", flush=True)
+            r = traiter(libelle, issns, annee, sans_hopitaux, prio)
+            resultats.append(r)
+            locs = r["localisations"]
+            print(f"== {libelle} — {annee}  ({r['duree']:.0f} s)")
+            print("   Nantes :", r["verdict_nantes"] or "pas d'accès électronique trouvé")
+            print("   Accès sans PEB :", r["verdict"] or "non trouvé")
+            print(f"   {len(locs)} localisations, {sum(l['confiance'] == 'haute' for l in locs)} sûres, "
+                  f"{sum(l['prioritaire'] == 'oui' for l in locs)} en BU prioritaire")
+            for l in [l for l in locs if l["confiance"] != "faible"][:8]:
+                print(f"     [{l['support'][:4]}] {l['confiance']:<8} {l['bibliotheque'][:40]:<41} {l['peb'][:24]:<25} {l['source']}",
+                      flush=True)
+    return resultats
+
+
+def ecrire_csv(resultats, chemin):
+    with open(chemin, "w", newline="", encoding="utf-8-sig") as f:
+        w = csv.DictWriter(f, fieldnames=COLONNES, delimiter=";", extrasaction="ignore")
+        w.writeheader()
+        for r in resultats:
+            w.writerows(r["nantes"])
+            w.writerows(r["acces"])
+            w.writerows(r["localisations"])
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("csv", nargs="?", help="fichier libelle;issn;annee")
@@ -190,38 +256,16 @@ def main():
     a = ap.parse_args()
     peb_sudoc.UTILISER_CACHE = not a.sans_cache
 
-    demandes = []
     if a.csv:
         with open(a.csv, encoding="utf-8-sig") as f:
-            for r in csv.DictReader(f, delimiter=";"):
-                demandes.append((r["libelle"], r["issn"].split(), peb_sudoc.lire_annees(r["annee"])))
+            demandes = lire_demandes(f)
     elif a.issn and a.annee:
-        demandes.append((" / ".join(a.issn), a.issn, peb_sudoc.lire_annees(a.annee)))
+        demandes = [(" / ".join(a.issn), a.issn, peb_sudoc.lire_annees(a.annee))]
     else:
         ap.error("donner un CSV ou --issn ... --annee ...")
 
-    prio = rcr_prioritaires()
-    resultats = []
-    for libelle, issns, annees in demandes:
-        for annee in annees:
-            r = traiter(libelle, issns, annee, a.sans_hopitaux, prio)
-            resultats.append(r)
-            locs = r["localisations"]
-            print(f"\n== {libelle} — {annee}  ({r['duree']:.0f} s)")
-            print("   Nantes :", r["verdict_nantes"] or "pas d'accès électronique trouvé")
-            print("   Accès sans PEB :", r["verdict"] or "non trouvé")
-            print(f"   {len(locs)} localisations, {sum(l['confiance'] == 'haute' for l in locs)} sûres, "
-                  f"{sum(l['prioritaire'] == 'oui' for l in locs)} en BU prioritaire")
-            for l in [l for l in locs if l["confiance"] != "faible"][:8]:
-                print(f"     [{l['support'][:4]}] {l['confiance']:<8} {l['bibliotheque'][:40]:<41} {l['peb'][:24]:<25} {l['source']}")
-
-    with open(a.sortie, "w", newline="", encoding="utf-8-sig") as f:
-        w = csv.DictWriter(f, fieldnames=COLONNES, delimiter=";", extrasaction="ignore")
-        w.writeheader()
-        for r in resultats:
-            w.writerows(r["nantes"])
-            w.writerows(r["acces"])
-            w.writerows(r["localisations"])
+    resultats = executer(demandes, a.sans_hopitaux)
+    ecrire_csv(resultats, a.sortie)
     rapport_html(resultats, a.html)
     print(f"\n-> {a.sortie}\n-> {a.html}")
 

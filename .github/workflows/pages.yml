@@ -1,0 +1,39 @@
+# Publie la page de test de Repério sur GitHub Pages à chaque push sur main.
+# Le site = web/ + les modules Python dans py/ (exécutés dans le navigateur par Pyodide).
+# L'index des fonds de Nantes n'est PAS publié : chaque utilisateur le charge depuis Uncloud.
+name: Page GitHub
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assembler le site
+        run: |
+          mkdir -p _site/py
+          cp web/* _site/
+          cp peb_sudoc.py peb_acces.py peb_resolveurs.py peb_nantes.py reperio.py resolveurs.csv _site/py/
+          python3 -m py_compile _site/py/*.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deploiement
+        uses: actions/deploy-pages@v4

@@ -26,7 +26,7 @@ Liens suivis dans les notices :
 
 Uniquement la bibliothèque standard Python.
 """
-import argparse, csv, hashlib, json, os, re, sys, time, urllib.request, urllib.error
+import argparse, csv, hashlib, json, os, re, sys, time, urllib.parse, urllib.request, urllib.error
 import xml.etree.ElementTree as ET
 
 BASE = "https://www.sudoc.fr"
@@ -65,6 +65,45 @@ def _chemin_cache(url):
     return os.path.join(CACHE_DIR, hashlib.sha1(url.encode()).hexdigest() + ".txt")
 
 
+def _cle_openalex():
+    """Clé d'API OpenAlex : variable OPENALEX_API_KEY, sinon fichier .env à côté des scripts
+    (ignoré par git : le dépôt est public). Chaîne vide si aucune clé."""
+    cle = os.environ.get("OPENALEX_API_KEY", "").strip()
+    if cle:
+        return cle
+    try:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"), encoding="utf-8") as f:
+            for ligne in f:
+                nom, _, valeur = ligne.partition("=")
+                if nom.strip().removeprefix("export ").strip() == "OPENALEX_API_KEY":
+                    return valeur.strip().strip("'\"")
+    except OSError:
+        pass
+    return ""
+
+
+OPENALEX_API_KEY = _cle_openalex()
+
+
+def _telecharger_urllib(url):
+    """(code HTTP, texte). Lève OSError si le serveur ne répond pas.
+    La clé OpenAlex est ajoutée ici, après le calcul du cache : elle n'entre ni dans le cache
+    ni dans les messages d'erreur, et la page web (autre transport) ne l'envoie jamais."""
+    if OPENALEX_API_KEY and url.startswith("https://api.openalex.org/"):
+        url += ("&" if "?" in url else "?") + "api_key=" + urllib.parse.quote(OPENALEX_API_KEY)
+    req = urllib.request.Request(url, headers=UA)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return r.status, r.read().decode("utf-8")
+    except urllib.error.HTTPError as e:
+        return e.code, ""
+
+
+# Transport HTTP : urllib en ligne de commande ; la page web (web/worker.js) le remplace
+# par une requête du navigateur.
+TELECHARGER = _telecharger_urllib
+
+
 def get(url):
     """Renvoie le texte de la réponse, ou None si 404. Met en cache sur disque."""
     chemin = _chemin_cache(url)
@@ -72,21 +111,21 @@ def get(url):
         with open(chemin, encoding="utf-8") as f:
             txt = f.read()
         return txt or None
-    req = urllib.request.Request(url, headers=UA)
     txt = None
     for essai in range(3):
         try:
-            with urllib.request.urlopen(req, timeout=30) as r:
-                time.sleep(PAUSE)
-                txt = r.read().decode("utf-8")
-                break
-        except urllib.error.HTTPError as e:
-            if e.code == 404:
-                txt = ""
-                break
+            code, corps = TELECHARGER(url)
+        except OSError:
             time.sleep(2 * (essai + 1))
-        except urllib.error.URLError:
-            time.sleep(2 * (essai + 1))
+            continue
+        if 200 <= code < 300:
+            time.sleep(PAUSE)
+            txt = corps
+            break
+        if code == 404:
+            txt = ""
+            break
+        time.sleep(2 * (essai + 1))
     else:
         raise RuntimeError(f"Échec : {url}")
     if UTILISER_CACHE:
