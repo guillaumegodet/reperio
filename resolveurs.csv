@@ -1,19 +1,30 @@
-rcr;bibliotheque;ville;etablissement;type;hote;institution;statut;remarque;filtre_paquet;;catalogue
-441092101;BU Santé;Nantes;Nantes Université;hlm;;;actif;Ressources électroniques : export EBSCO HLM du catalogue Nantilus (peb_nantes.py) ; le papier vient du Sudoc;[''];https://nantilus.univ-nantes.fr/vufind/Search/Results?lookfor={issn}&type=ISN
-693882213;BU Odontologie;Lyon;Université Lyon 1;ebsco;;gx5tqd;non interrogeable;EBSCO Discovery : authentification requise;;;
-693882101;BU Santé Lyon Sud / Rockefeller;Lyon;Université Lyon 1;ebsco;;gx5tqd;non interrogeable;Même RCR pour Lyon Sud et Rockefeller ; EBSCO Discovery : authentification requise;[''];
-543952103;BU Santé;Vandœuvre-lès-Nancy;Université de Lorraine;alma;eu01;33UDL_INST;actif;Résolveur Alma public;;;https://udl.primo.exlibrisgroup.com/discovery/search?vid=33UDL_INST:UDL&query=issn,exact,{issn}&lang=fr
-870852108;BU Santé;Limoges;Université de Limoges;ebsco;;s4262730;non interrogeable;EBSCO Publication Finder : authentification requise;;;
-352382103;BU Santé;Rennes;Université de Rennes;ebsco;;s5189289;non interrogeable;EBSCO : authentification requise;;;
-212312103;BU Santé;Dijon;Université de Bourgogne;alma;eu03;33UB_INST;actif;Résolveur Alma public;;;https://catalogue-bu.u-bourgogne.fr/discovery/search?vid=33UB_INST:33UB_INST&query=issn,exact,{issn}&lang=fr
-250562102;BU Médecine Pharmacie;Besançon;Université de Franche-Comté;alma;eu03;33UFC_INST;actif;Résolveur Alma public (la ligne « Service administratif du SCD » de bu-prio.csv, sans RCR, renvoie à cette BU);;;https://ariane.umlp.fr/discovery/search?vid=33UFC_INST:33UFC_INST&query=issn,exact,{issn}&lang=fr
-974110001;BU Tampon;Le Tampon;Université de La Réunion;inconnu;;;à identifier;;;;
-301892101;BU Médecine Nîmes;Nîmes;Université de Montpellier;alma;eu02;33MON_INST;actif;Résolveur Alma public (BIU Montpellier);Nîmes;;https://catalogue.scdi-montpellier.fr/nde/search?vid=33MON_INST:33UM_NDE&query=issn,exact,{issn}&lang=fr
-341722110;Odontologie;Montpellier;Université de Montpellier;alma;eu02;33MON_INST;actif;Résolveur Alma public (BIU Montpellier);UM UPV;;https://catalogue.scdi-montpellier.fr/nde/search?vid=33MON_INST:33UM_NDE&query=issn,exact,{issn}&lang=fr
-751062107;Pôle Pharmacie-Biologie-Cosmétologie;Paris;Université Paris Cité;alma;;;à identifier;Primo VE uspc-upde : code institution Alma non trouvé;;;
-514542104;Bibliothèque du Pôle Santé;Reims;Université de Reims Champagne-Ardenne;inconnu;;;à identifier;;;;
-330632101;BU Sciences du Vivant et de la Santé;Bordeaux;Université de Bordeaux;alma;eu02;33PUDB_UB;actif;Résolveur Alma public (réseau Babord+);;;https://pudb-ub.primo.exlibrisgroup.com/discovery/search?vid=33PUDB_UB:33PUDB_UB_VU1&query=issn,exact,{issn}&lang=fr
-290192102;BU Santé UBO;Brest;Université de Bretagne Occidentale;ebsco;;;non interrogeable;EBSCO : authentification requise;;;
-593502101;BU Santé - Learning Center;Loos;Université de Lille;alma;eu01;33UDLILLE_INST;actif;Résolveur Alma public;;;https://lillocat.univ-lille.fr/discovery/search?vid=33UDLILLE_INST:ULILLE&query=issn,exact,{issn}&lang=fr
-422182102;BU Santé;Saint-Priest-en-Jarez;Université Jean Monnet Saint-Étienne;inconnu;;;à identifier;;;;
-141182102;BU Madeleine Brès;Caen;Université de Caen Normandie;inconnu;;;à identifier;;;;
+rcr;bibliotheque;ville;etablissement;type;hote;institution;statut;prioritaire;remarque;filtre_paquet;catalogue
+441092101;BU Santé;Nantes;Nantes Université;hlm;;;actif;oui;Ressources électroniques : export EBSCO HLM du catalogue Nantilus (peb_nantes.py) ; le papier vient du Sudoc;https://nantilus.univ-nantes.fr/vufind/Search/Results?lookfor={issn}&type=ISN
+693882213;BU Odontologie;Lyon;Université Lyon 1;ebsco;;gx5tqd;non interrogeable;oui;EBSCO Discovery : authentification requise;;
+693882101;BU Santé Lyon Sud / Rockefeller;Lyon;Université Lyon 1;ebsco;;gx5tqd;non interrogeable;oui;Même RCR pour Lyon Sud et Rockefeller ; EBSCO Discovery : authentification requise;
+543952103;BU Santé;Vandœuvre-lès-Nancy;Université de Lorraine;alma;eu01;33UDL_INST;actif;oui;Résolveur Alma public;;https://udl.primo.exlibrisgroup.com/discovery/search?vid=33UDL_INST:UDL&query=issn,exact,{issn}&lang=fr
+870852108;BU Santé;Limoges;Université de Limoges;ebsco;;s4262730;non interrogeable;oui;EBSCO Publication Finder : authentification requise;;
+352382103;BU Santé;Rennes;Université de Rennes;ebsco;;s5189289;non interrogeable;oui;EBSCO : authentification requise;;
+212312103;BU Santé;Dijon;Université de Bourgogne;alma;eu03;33UB_INST;actif;oui;Résolveur Alma public;;https://catalogue-bu.u-bourgogne.fr/discovery/search?vid=33UB_INST:33UB_INST&query=issn,exact,{issn}&lang=fr
+250562102;BU Médecine Pharmacie;Besançon;Université de Franche-Comté;alma;eu03;33UFC_INST;actif;oui;Résolveur Alma public (la ligne « Service administratif du SCD » de bu-prio.csv, sans RCR, renvoie à cette BU);;https://ariane.umlp.fr/discovery/search?vid=33UFC_INST:33UFC_INST&query=issn,exact,{issn}&lang=fr
+974110001;BU Tampon;Le Tampon;Université de La Réunion;inconnu;;;à identifier;oui;;;
+301892101;BU Médecine Nîmes;Nîmes;Université de Montpellier;alma;eu02;33MON_INST;actif;oui;Résolveur Alma public (BIU Montpellier);Nîmes;https://catalogue.scdi-montpellier.fr/nde/search?vid=33MON_INST:33UM_NDE&query=issn,exact,{issn}&lang=fr
+341722110;Odontologie;Montpellier;Université de Montpellier;alma;eu02;33MON_INST;actif;oui;Résolveur Alma public (BIU Montpellier);UM UPV;https://catalogue.scdi-montpellier.fr/nde/search?vid=33MON_INST:33UM_NDE&query=issn,exact,{issn}&lang=fr
+751062107;Pôle Pharmacie-Biologie-Cosmétologie;Paris;Université Paris Cité;alma;eu00;33USPC_UPDE;actif;oui;Résolveur Alma public (Paris Cité, santé);;https://uspc-upde.primo.exlibrisgroup.com/discovery/search?vid=33USPC_UPDE:UPDE&query=issn,exact,{issn}&lang=fr
+514542104;Bibliothèque du Pôle Santé;Reims;Université de Reims Champagne-Ardenne;inconnu;;;à identifier;oui;;;
+330632101;BU Sciences du Vivant et de la Santé;Bordeaux;Université de Bordeaux;alma;eu02;33PUDB_UB;actif;oui;Résolveur Alma public (réseau Babord+);;https://pudb-ub.primo.exlibrisgroup.com/discovery/search?vid=33PUDB_UB:33PUDB_UB_VU1&query=issn,exact,{issn}&lang=fr
+290192102;BU Santé UBO;Brest;Université de Bretagne Occidentale;ebsco;;;non interrogeable;oui;EBSCO : authentification requise;;
+593502101;BU Santé - Learning Center;Loos;Université de Lille;alma;eu01;33UDLILLE_INST;actif;oui;Résolveur Alma public;;https://lillocat.univ-lille.fr/discovery/search?vid=33UDLILLE_INST:ULILLE&query=issn,exact,{issn}&lang=fr
+422182102;BU Santé;Saint-Priest-en-Jarez;Université Jean Monnet Saint-Étienne;inconnu;;;à identifier;oui;;;
+141182102;BU Madeleine Brès;Caen;Université de Caen Normandie;inconnu;;;à identifier;oui;;;
+;toutes les BU;Le Havre;Université Le Havre Normandie;alma;eu02;33UDH_INST;actif;non;Résolveur Alma public (repéré le 14/11/2026 depuis le jeu ESR des bibliothèques);;https://catalogue.univ-lehavre.fr/discovery/search?vid=33UDH_INST:33UDH_VU1&query=issn,exact,{issn}&lang=fr
+;toutes les BU;Grenoble;Université Grenoble Alpes;alma;eu03;33UGRENOBLE_INST;actif;non;Résolveur Alma public (repéré le 14/11/2026 depuis le jeu ESR des bibliothèques);;https://beluga.univ-grenoble-alpes.fr/discovery/search?vid=33UGRENOBLE_INST:UGrenoble&query=issn,exact,{issn}&lang=fr
+;toutes les BU;Créteil;Université Paris-Est Créteil;alma;eu00;33BUCRET_INST;actif;non;Résolveur Alma public (repéré le 14/11/2026 depuis le jeu ESR des bibliothèques);;https://athena.u-pec.fr/discovery/search?vid=33BUCRET_INST:upec&query=issn,exact,{issn}&lang=fr
+;toutes les BU;Dunkerque;Université du Littoral Côte d'Opale;alma;eu02;33BULCO_INST;actif;non;Résolveur Alma public (repéré le 14/11/2026 depuis le jeu ESR des bibliothèques);;https://calypso.univ-littoral.fr/discovery/search?vid=33BULCO_INST:NDEBULCO1&query=issn,exact,{issn}&lang=fr
+;toutes les BU;Poitiers;Université de Poitiers;alma;eu03;33UDP_INST;actif;non;Résolveur Alma public (repéré le 14/11/2026 depuis le jeu ESR des bibliothèques);;https://univ-poitiers.primo.exlibrisgroup.com/discovery/search?vid=33UDP_INST:Vue_Principale_NDE&query=issn,exact,{issn}&lang=fr
+;toutes les BU;Paris;Université Sorbonne Nouvelle;alma;eu00;33USPC_USN;actif;non;Résolveur Alma public (repéré le 14/11/2026 depuis le jeu ESR des bibliothèques);;https://catalogue-bsn.sorbonne-nouvelle.fr/discovery/search?vid=33USPC_USN:USN&query=issn,exact,{issn}&lang=fr
+;toutes les BU;Paris;Collège de France;alma;eu03;33CDF_INST;actif;non;Résolveur Alma public (repéré le 14/11/2026 depuis le jeu ESR des bibliothèques);;https://omnia.college-de-france.fr/discovery/search?vid=33CDF_INST:33CDF_INST&query=issn,exact,{issn}&lang=fr
+;toutes les BU;Pau;Université de Pau et des Pays de l'Adour;alma;eu03;33BUPAU_INST;actif;non;Résolveur Alma public (repéré le 14/11/2026 depuis le jeu ESR des bibliothèques);;https://uppa.primo.exlibrisgroup.com/discovery/search?vid=33BUPAU_INST:BUPAU&query=issn,exact,{issn}&lang=fr
+;toutes les BU;Pointe-à-Pitre;Université des Antilles;alma;eu00;33UAG_INST;actif;non;Résolveur Alma public (repéré le 14/11/2026 depuis le jeu ESR des bibliothèques);;https://ua.primo.exlibrisgroup.com/discovery/search?vid=33UAG_INST:33UAG_INST&query=issn,exact,{issn}&lang=fr
+;toutes les BU;Paris;Bibliothèque interuniversitaire Cujas;alma;eu03;33CUJAS_INST;actif;non;Résolveur Alma public (repéré le 14/11/2026 depuis le jeu ESR des bibliothèques);;https://bcujas-catalogue.univ-paris1.fr/discovery/search?vid=33CUJAS_INST:33CUJAS_INST&query=issn,exact,{issn}&lang=fr
+;toutes les BU;Toulon;Université de Toulon;alma;eu01;33UST_INST;actif;non;Résolveur Alma public (repéré le 14/11/2026 depuis le jeu ESR des bibliothèques);;https://univ-tln.primo.exlibrisgroup.com/discovery/search?vid=33UST_INST:UTLN&query=issn,exact,{issn}&lang=fr

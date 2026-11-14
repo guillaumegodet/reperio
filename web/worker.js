@@ -47,12 +47,20 @@ def etat_index():
     peb_nantes._CHARGE.clear()
     return peb_nantes.etat()[1]
 
-def lancer(texte, sans_hopitaux, sans_cache):
+def lancer_etapes(texte, sans_hopitaux, sans_cache):
+    """Générateur : produit les listes d'URL que le worker télécharge en parallèle (fetch),
+    puis renvoie (html, csv, nombre de recherches)."""
     peb_sudoc.UTILISER_CACHE = not sans_cache
+    peb_sudoc._MEMOIRE.clear()
     demandes = reperio.lire_demandes(texte.splitlines())
     if not demandes:
         raise ValueError("Aucune demande lisible : il faut au moins un ISSN et une année.")
-    res = reperio.executer(demandes, sans_hopitaux)
+    etapes = reperio.executer_par_etapes(demandes, sans_hopitaux)
+    try:
+        while True:
+            yield peb_sudoc.a_telecharger(next(etapes))
+    except StopIteration as fin:
+        res = fin.value
     reperio.rapport_html(res, "/tmp/rapport.html")
     reperio.ecrire_csv(res, "/tmp/resultats.csv")
     return (open("/tmp/rapport.html", encoding="utf-8").read(),
@@ -77,6 +85,28 @@ async function initialiser() {
   await py.runPythonAsync(AMORCE);
 }
 
+// Requêtes aux résolveurs en parallèle (8 à la fois) ; les réponses sont déposées dans le cache
+// Python. Une requête en échec n'est pas déposée : Python la refera lui-même, une à une.
+async function precharger(urls) {
+  if (!urls.length) return;
+  const deposer = py.pyimport("peb_sudoc").deposer;
+  let i = 0;
+  async function ouvrier() {
+    while (i < urls.length) {
+      const url = urls[i++];
+      const arret = new AbortController();
+      const minuterie = setTimeout(() => arret.abort(), 30000);
+      try {
+        const r = await fetch(url, { signal: arret.signal });
+        deposer(url, r.status, await r.text());
+      } catch (e) { /* réseau ou délai dépassé */ }
+      clearTimeout(minuterie);
+    }
+  }
+  await Promise.all(Array.from({ length: 8 }, ouvrier));
+  deposer.destroy();
+}
+
 function etatIndex() {
   return py.globals.get("etat_index")();
 }
@@ -98,10 +128,17 @@ onmessage = async (ev) => {
       try { py.FS.unlink(INDEX); } catch (e) { /* déjà absent */ }
       postMessage({ type: "index", index: etatIndex() });
     } else if (m.type === "lancer") {
-      const lancer = py.globals.get("lancer");
-      const res = lancer(m.texte, m.sansHopitaux, m.sansCache);
-      const [html, csv, n] = res.toJs();
-      res.destroy();
+      const etapes = py.globals.get("lancer_etapes")(m.texte, m.sansHopitaux, m.sansCache);
+      let pas = etapes.next();
+      while (!pas.done) {
+        const urls = pas.value.toJs();
+        pas.value.destroy();
+        await precharger(urls);
+        pas = etapes.next();
+      }
+      etapes.destroy();
+      const [html, csv, n] = pas.value.toJs();
+      pas.value.destroy();
       await syncfs(false).catch(() => {});
       postMessage({ type: "resultat", html, csv, n });
     }

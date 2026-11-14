@@ -66,6 +66,7 @@ Mettre à jour l'index pour les collègues : `python peb_nantes.py --indexer <no
 | `peb_resolveurs.py` | Résolveurs Alma des BU prioritaires |
 | `web/` | Page de test (GitHub Pages) : interface, worker Pyodide |
 | `logo/` | Logo (SVG fixes, animé, favicon) et `generer_logo.py` qui les régénère |
+| `recensement_bu.csv` | Recensement des 81 services documentaires de l'ESR : système, catalogue, code Alma |
 | `resolveurs.csv` | Table de configuration des résolveurs, une ligne par BU prioritaire |
 | `bu-prio.csv` | Liste des BU prioritaires transmise par l'équipe PEB |
 
@@ -131,7 +132,7 @@ Sans code, le Sudoc considère l'exemplaire comme disponible pour le PEB.
 
 ## Couverture des BU prioritaires
 
-Sur les 18 RCR de la liste, 8 BU sont interrogées automatiquement : 7 par 6 résolveurs Alma publics (Montpellier sert à la fois l'odontologie et Nîmes), et Nantes par l'export HLM de Nantilus.
+Sur les 18 RCR de la liste, 9 BU sont interrogées automatiquement : 8 par 7 résolveurs Alma publics (Montpellier sert à la fois l'odontologie et Nîmes), et Nantes par l'export HLM de Nantilus.
 
 | BU | Établissement | Code Alma | Statut |
 | --- | --- | --- | --- |
@@ -146,7 +147,7 @@ Sur les 18 RCR de la liste, 8 BU sont interrogées automatiquement : 7 par 6 ré
 | BU Santé (Limoges) | Université de Limoges | — | EBSCO, authentification requise |
 | BU Santé (Rennes) | Université de Rennes | — | EBSCO, authentification requise |
 | BU Santé UBO (Brest) | Université de Bretagne Occidentale | — | EBSCO, authentification requise |
-| Pôle Pharmacie-Biologie-Cosmétologie (Paris) | Université Paris Cité | non trouvé | Alma, code à identifier |
+| Pôle Pharmacie-Biologie-Cosmétologie (Paris) | Université Paris Cité | `33USPC_UPDE` (eu00) | interrogée |
 | BU Santé (Nantes) | Nantes Université | — | export HLM Nantilus (`peb_nantes.py`) |
 | BU Tampon | Université de La Réunion | — | Résolveur à identifier |
 | Bibliothèque du Pôle Santé (Reims) | Université de Reims Champagne-Ardenne | — | Résolveur à identifier |
@@ -156,6 +157,25 @@ Sur les 18 RCR de la liste, 8 BU sont interrogées automatiquement : 7 par 6 ré
 La BU Odontologie, d'une part, et Lyon Sud et Rockefeller, d'autre part, ont deux RCR distincts à Lyon 1.
 
 Les BU non interrogées automatiquement restent couvertes par le Sudoc.
+
+## Autres établissements de l'enseignement supérieur
+
+Au-delà des BU prioritaires, Repério interroge tous les établissements dont le résolveur Alma est public. Leurs lignes portent sur l'établissement entier (« toutes les BU ») : l'accès électronique vaut pour toutes ses bibliothèques. Le Sudoc couvre déjà le papier de toutes les BU.
+
+Recensement du 14/11/2026, à partir du jeu [Bibliothèques de l'Enseignement supérieur](https://data.enseignementsup-recherche.gouv.fr/explore/assets/fr-esr-bibliotheques-de-l-enseignement-superieur/) (81 services documentaires, 549 RCR, données de 2018) : les sites web de chaque service ont été parcourus à la recherche de leur catalogue, puis chaque code d'établissement Alma a été essayé sur les serveurs eu00 à eu03.
+
+| Système | Établissements | Dans Repério |
+| --- | --- | --- |
+| Alma / Primo, résolveur public | 18 | oui (19 lignes : Montpellier sert deux BU prioritaires) |
+| Primo repéré, mais code ou résolveur introuvable | 7 | non : Arts et Métiers, UTBM, Versailles Saint-Quentin, Paris Nanterre, La Réunion, La contemporaine, École française de Rome |
+| EBSCO (EDS, Publication Finder) | 13 | non : authentification requise ; Nantes passe par son export |
+| Koha, SFX, autres | 5 | non |
+| Non déterminé | 38 | non (adresse de 2018 périmée, petite bibliothèque, catalogue non lié depuis le site) |
+
+Établissements ajoutés : Le Havre, Grenoble Alpes, Paris-Est Créteil, Littoral Côte d'Opale, Poitiers, Sorbonne Nouvelle, Collège de France, Pau et Pays de l'Adour, Antilles, Bibliothèque Cujas, Toulon. 
+Le détail par service documentaire est dans `recensement_bu.csv` (système repéré, catalogue, code et serveur Alma) : c'est la liste de travail pour compléter `resolveurs.csv`.
+
+Les 19 résolveurs sont interrogés en parallèle (8 requêtes à la fois) : une recherche ne prend pas plus de temps qu'avec 7.
 
 ## Limites connues
 

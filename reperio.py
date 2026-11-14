@@ -25,7 +25,8 @@ RANG_CONFIANCE = {"haute": 0, "moyenne": 1, "faible": 2}
 
 def rcr_prioritaires():
     try:
-        return {c["rcr"] for c in peb_resolveurs.charger_config() if c["rcr"]}
+        return {c["rcr"] for c in peb_resolveurs.charger_config()
+                if c["rcr"] and c.get("prioritaire", "oui") == "oui"}
     except FileNotFoundError:
         return set()
 
@@ -53,9 +54,13 @@ def cle_tri(l):
             l["support"] != "papier", l["bibliotheque"])
 
 
-def traiter(libelle, issns, annee, sans_hopitaux, prio):
+def traiter_par_etapes(libelle, issns, annee, sans_hopitaux, prio):
+    """Générateur : s'arrête une fois sur la liste des requêtes aux résolveurs, pour que l'appelant
+    les télécharge en parallèle (threads en ligne de commande, fetch dans la page web),
+    puis renvoie le résultat (StopIteration.value)."""
     t0 = time.time()
     tous_issns = peb_sudoc.issns_utiles(issns, annee)
+    yield peb_resolveurs.urls(tous_issns, annee)
     verdict_nantes, nantes = peb_nantes.evaluer(libelle, tous_issns, annee)
     verdict, acces = peb_acces.evaluer(libelle, tous_issns, annee)
     sudoc = lignes_sudoc(libelle, issns, annee, sans_hopitaux, prio)
@@ -212,15 +217,25 @@ def lire_demandes(lignes):
     return demandes
 
 
-def executer(demandes, sans_hopitaux=False):
-    """Traite toutes les demandes ; affiche l'avancement au fil de l'eau."""
+def traiter(libelle, issns, annee, sans_hopitaux, prio):
+    etapes = traiter_par_etapes(libelle, issns, annee, sans_hopitaux, prio)
+    peb_sudoc.precharger(next(etapes))
+    try:
+        next(etapes)
+    except StopIteration as fin:
+        return fin.value
+
+
+def executer_par_etapes(demandes, sans_hopitaux=False):
+    """Traite toutes les demandes ; affiche l'avancement au fil de l'eau. Générateur : produit les
+    listes d'URL à précharger, renvoie la liste des résultats (voir traiter_par_etapes)."""
     prio = rcr_prioritaires()
     resultats = []
     total = sum(len(annees) for _, _, annees in demandes)
     for libelle, issns, annees in demandes:
         for annee in annees:
             print(f"\n[{len(resultats) + 1}/{total}] {libelle} — {annee} : recherche…", flush=True)
-            r = traiter(libelle, issns, annee, sans_hopitaux, prio)
+            r = yield from traiter_par_etapes(libelle, issns, annee, sans_hopitaux, prio)
             resultats.append(r)
             locs = r["localisations"]
             print(f"== {libelle} — {annee}  ({r['duree']:.0f} s)")
@@ -232,6 +247,15 @@ def executer(demandes, sans_hopitaux=False):
                 print(f"     [{l['support'][:4]}] {l['confiance']:<8} {l['bibliotheque'][:40]:<41} {l['peb'][:24]:<25} {l['source']}",
                       flush=True)
     return resultats
+
+
+def executer(demandes, sans_hopitaux=False):
+    etapes = executer_par_etapes(demandes, sans_hopitaux)
+    try:
+        while True:
+            peb_sudoc.precharger(next(etapes))
+    except StopIteration as fin:
+        return fin.value
 
 
 def ecrire_csv(resultats, chemin):

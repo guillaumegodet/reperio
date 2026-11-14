@@ -104,12 +104,70 @@ def _telecharger_urllib(url):
 TELECHARGER = _telecharger_urllib
 
 
+# Réponses de la session en cours (préchargées en parallèle, ou déjà lues) : évite de refaire
+# une requête, même quand le cache disque est désactivé.
+_MEMOIRE = {}
+
+
+def _memoriser(url, txt):
+    _MEMOIRE[url] = txt
+    if UTILISER_CACHE:
+        os.makedirs(CACHE_DIR, exist_ok=True)
+        with open(_chemin_cache(url), "w", encoding="utf-8") as f:
+            f.write(txt)
+
+
+def deposer(url, code, texte):
+    """Enregistre une réponse obtenue ailleurs (la page web la télécharge en parallèle).
+    Seules les réponses définitives sont gardées : 2xx et 404."""
+    if 200 <= code < 300:
+        _memoriser(url, texte or "")
+    elif code == 404:
+        _memoriser(url, "")
+
+
+def _en_cache(url):
+    if url in _MEMOIRE:
+        return True
+    chemin = _chemin_cache(url)
+    return UTILISER_CACHE and os.path.exists(chemin) and time.time() - os.path.getmtime(chemin) < CACHE_TTL
+
+
+def a_telecharger(urls):
+    """URL absentes du cache (mémoire ou disque), sans doublon."""
+    return [u for u in dict.fromkeys(urls) if not _en_cache(u)]
+
+
+def precharger(urls, travailleurs=8):
+    """Télécharge en parallèle les URL absentes du cache (ligne de commande). Sans threads
+    (navigateur), ne fait rien : get() les lira une à une, ou la page les aura déposées."""
+    a_faire = a_telecharger(urls)
+    if len(a_faire) < 2:
+        return
+    try:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(travailleurs) as ex:
+            list(ex.map(_get_silencieux, a_faire))
+    except RuntimeError:
+        pass
+
+
+def _get_silencieux(url):
+    try:
+        get(url)
+    except RuntimeError:
+        pass
+
+
 def get(url):
-    """Renvoie le texte de la réponse, ou None si 404. Met en cache sur disque."""
+    """Renvoie le texte de la réponse, ou None si 404. Met en cache (mémoire et disque)."""
+    if url in _MEMOIRE:
+        return _MEMOIRE[url] or None
     chemin = _chemin_cache(url)
     if UTILISER_CACHE and os.path.exists(chemin) and time.time() - os.path.getmtime(chemin) < CACHE_TTL:
         with open(chemin, encoding="utf-8") as f:
             txt = f.read()
+        _MEMOIRE[url] = txt
         return txt or None
     txt = None
     for essai in range(3):
@@ -128,10 +186,7 @@ def get(url):
         time.sleep(2 * (essai + 1))
     else:
         raise RuntimeError(f"Échec : {url}")
-    if UTILISER_CACHE:
-        os.makedirs(CACHE_DIR, exist_ok=True)
-        with open(chemin, "w", encoding="utf-8") as f:
-            f.write(txt)
+    _memoriser(url, txt)
     return txt or None
 
 

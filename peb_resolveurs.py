@@ -47,13 +47,27 @@ def couvre(availability, annee):
     return True
 
 
-def alma(conf, issn, annee):
-    """Renvoie la liste des services texte intégral pour (issn, annee), ou None si pas de réponse."""
+def url_alma(conf, issn, annee):
     params = {"ctx_ver": "Z39.88-2004", "ctx_enc": "info:ofi/enc:UTF-8", "url_ver": "Z39.88-2004",
               "rft.genre": "journal", "rft.issn": issn, "rft.year": annee, "rft.date": annee,
               "svc_dat": "CTO"}
-    url = (f"https://{conf['hote']}.alma.exlibrisgroup.com/view/uresolver/{conf['institution']}/openurl?"
-           + urllib.parse.urlencode(params))
+    return (f"https://{conf['hote']}.alma.exlibrisgroup.com/view/uresolver/{conf['institution']}/openurl?"
+            + urllib.parse.urlencode(params))
+
+
+def actifs(config=None):
+    return [c for c in (config or charger_config()) if c["type"] == "alma" and c["statut"] == "actif"]
+
+
+def urls(issns, annee, config=None):
+    """Toutes les requêtes que fera interroger() : la page web et la ligne de commande les
+    téléchargent en parallèle avant (un résolveur partagé par plusieurs BU n'est compté qu'une fois)."""
+    return list(dict.fromkeys(url_alma(c, i, annee) for c in actifs(config) for i in issns))
+
+
+def alma(conf, issn, annee):
+    """Renvoie la liste des services texte intégral pour (issn, annee), ou None si pas de réponse."""
+    url = url_alma(conf, issn, annee)
     try:
         txt = get(url)
     except RuntimeError:
@@ -104,12 +118,13 @@ def interroger(libelle, issns, annee, config=None):
     lignes, etat = [], {}
     deja = set()       # un même résolveur (ex. Montpellier) peut servir plusieurs BU
     for conf in config:
+        cle = conf["rcr"] or conf["institution"] or conf["etablissement"]
         if conf["type"] == "hlm":      # lignes produites par peb_nantes.evaluer, appelé par reperio.py
             ok, txt = peb_nantes.etat()
-            etat[conf["rcr"]] = "interrogé" if ok else txt
+            etat[cle] = "interrogé" if ok else txt
             continue
         if conf["type"] != "alma" or conf["statut"] != "actif":
-            etat[conf["rcr"]] = conf["statut"]
+            etat[cle] = conf["statut"]
             continue
         cle_res = (conf["hote"], conf["institution"])
         services, repondu = [], False
@@ -118,7 +133,7 @@ def interroger(libelle, issns, annee, config=None):
             if r is not None:
                 repondu = True
                 services += [dict(s, issn=issn) for s in r]
-        etat[conf["rcr"]] = "interrogé" if repondu else "pas de réponse"
+        etat[cle] = "interrogé" if repondu else "pas de réponse"
         # Une ligne par BU : les bouquets qui couvrent l'année sont regroupés
         couvrants = {}
         motif = (conf.get("filtre_paquet") or "").strip()
@@ -133,8 +148,9 @@ def interroger(libelle, issns, annee, config=None):
                 "demande": libelle, "annee": annee,
                 "statut": "libre accès" if all(s["libre"] for s in ss) else "oui (accès en ligne)",
                 "confiance": "haute",
-                "bibliotheque": f"{conf['etablissement']} ({conf['bibliotheque']})",
-                "type": "BU", "rcr": conf["rcr"], "prioritaire": "oui",
+                "bibliotheque": conf["etablissement"] + (f" ({conf['bibliotheque']})" if conf["rcr"] else ""),
+                "type": "BU", "rcr": conf["rcr"],
+                "prioritaire": "oui" if conf.get("prioritaire", "oui") == "oui" else "",
                 "support": "électronique",
                 "couverture": " | ".join(dict.fromkeys(s["couverture"] for s in ss)),
                 "peb": "clause PEB à vérifier" + (" (licence enregistrée)" if any(s["licence"] for s in ss) else ""),

@@ -1,0 +1,82 @@
+siege_id;siege;uai_etablissement;nb_rcr;systeme;institution_alma;hote_alma;catalogue;site_web
+0340834X;BIU Montpellier;0341089Z;21;Alma/Primo, résolveur public;33MON_INST;eu02;https://catalogue.scdi-montpellier.fr;https://www.scdi-montpellier.fr/
+0596013R;Bibliothèque de l'Université du Littoral Côte d'Opale;0595964M;7;Alma/Primo, résolveur public;33BULCO_INST;eu02;https://calypso.univ-littoral.fr;https://campusdelamer.fr/
+0752707K;Bibliothèque interuniversitaire Cujas;0751717J;1;Alma/Primo, résolveur public;33CUJAS_INST;eu03;https://bcujas-catalogue.univ-paris1.fr;https://biu-cujas.univ-paris1.fr/
+075Sante;Bibliothèque interuniversitaire de Santé;0751721N;2;Alma/Primo, résolveur public;33USPC_UPDE;eu00;https://uspc-upde.primo.exlibrisgroup.com;https://numerabilis.u-paris.fr/medica/
+0762856S;Bibliothèque universitaire du Havre;0762762P;2;Alma/Primo, résolveur public;33UDH_INST;eu02;https://catalogue.univ-lehavre.fr;https://bu.univ-lehavre.fr/
+0753480A;Collège de France;0753480A;12;Alma/Primo, résolveur public;33CDF_INST;eu03;https://omnia.college-de-france.fr;https://www.college-de-france.fr/fr
+0542400R;Direction de la Documentation et de l'Edition;0542493S;1;Alma/Primo, résolveur public;33UDL_INST;eu01;https://ulysse.univ-lorraine.fr;https://bu.univ-lorraine.fr/
+0333308S;Direction de la documentation;0333298F;25;Alma/Primo, résolveur public;33PUDB_UB;eu02;https://pudb-ub.primo.exlibrisgroup.com;https://bibliotheques.u-bordeaux.fr/
+0752734P;Direction des bibliothèques universitaires - Université Sorbonne nouvelle Paris 3;0751719L;12;Alma/Primo, résolveur public;33USPC_USN;eu00;https://catalogue-bsn.sorbonne-nouvelle.fr;https://www.dbu.univ-paris3.fr/accueil-dbu
+0941683U;SCD Université Paris Est Créteil;0941111X;15;Alma/Primo, résolveur public;33BUCRET_INST;eu00;https://athena.u-pec.fr;https://sess-staps.u-pec.fr/
+0595785T;Service Commun de Documentation de l'Université de Lille;0597065J;21;Alma/Primo, résolveur public;33UDLILLE_INST;eu01;https://lillocat.univ-lille.fr;http://crdp.univ-lille2.fr/
+0641439S;Service Commun de la Documentation de l'Université de Pau et de Pays de l'Adour;0640251A;9;Alma/Primo, résolveur public;33BUPAU_INST;eu03;https://uppa.primo.exlibrisgroup.com;https://bibliotheques.univ-pau.fr/fr/index.html
+0830989Z;Service Commun des Bibliothèques de l'Université de Toulon;0830766G;2;Alma/Primo, résolveur public;33UST_INST;eu01;https://univ-tln.primo.exlibrisgroup.com;https://bu.univ-tln.fr/
+0383505D;Service Interétablissement de Documentation - Université Grenoble Alpes / Grenoble INP;0383493R;6;Alma/Primo, résolveur public;33UGRENOBLE_INST;eu03;https://beluga.univ-grenoble-alpes.fr;https://bibliotheques.univ-grenoble-alpes.fr/
+0250986L;Service commun de la documentation de l'Université de Franche-Comté;0251215K;9;Alma/Primo, résolveur public;33UFC_INST;eu03;https://ariane.umlp.fr;https://bu.umlp.fr/
+0860701V;Service commun de la documentation de l'Université de Poitiers;0860856N;15;Alma/Primo, résolveur public;33UDP_INST;eu03;https://univ-poitiers.primo.exlibrisgroup.com;https://bu.univ-poitiers.fr/
+9720434P;Service commun de la documentation de l'Université des Antilles;9710585J;7;Alma/Primo, résolveur public;33UAG_INST;eu00;https://ua.primo.exlibrisgroup.com;http://bu.univ-antilles.fr/
+0211030F;Service commun de la documentation de l'université de Bourgogne;0211237F;16;Alma/Primo, résolveur public;33UB_INST;eu03;https://catalogue-bu.u-bourgogne.fr;https://bu.ube.fr/EXPLOITATION/
+0753237L;ENSAM (Arts et Métiers);0753237L;9;Primo, résolveur introuvable;33ENSAM_INST;;https://artsetmetiers.primo.exlibrisgroup.com;https://atrium.ensam.eu/
+1270009V;Ecole française de Rome;1270009V;1;Primo, code introuvable;;;https://efrome.primo.exlibrisgroup.com/mng/login;http://www.efrome.it/
+0921867E;La contemporaine. Bibliothèque, archives, musée des mondes contemporains;0921204J;1;Primo, code introuvable;;;http://primo.parisnanterre.fr;http://www.bdic.fr/
+0921510S;Service Commun de Documentation de l'Université Paris Nanterre;0921204J;3;Primo, code introuvable;;;http://primo-prod.parisnanterre.fr;https://bu.parisnanterre.fr/
+9740064B;Service commun de documentation - Université de La Réunion;9740478B;2;Primo, code introuvable;;;http://primo4-test.univ-reunion.fr;https://bu.univ-reunion.fr/
+0900441R;UNIVERSITÉ DE TECHNOLOGIE DE BELFORT-MONTBÉLIARD;0900424X;1;Primo, code introuvable;;;https://utbm.primo.exlibrisgroup.com/mng/login;http://www2.utbm.fr/
+0783398V;Université de Versailles Saint-Quentin-en-Yvelines , Direction des bibliothèques et de l'Information Scientifique et Technique;0781944P;3;Primo, code introuvable;;;https://33pup-primo4alma.hosted.exlibrisgroup.com;https://www.bib.uvsq.fr/
+0841028L;Bibliothèque Universitaire de l'Université d'Avignon et des pays de Vaucluse;0840685N;2;EBSCO;;;;https://bu.univ-avignon.fr/
+0752705H;Bibliothèque interuniversitaire de la Sorbonne;0751717J;2;EBSCO;;;;https://bibliotheques.pantheonsorbonne.fr/
+0755040W;Bibliothèque universitaire des langues et civilisations;0752148C;1;EBSCO;;;;https://www.bulac.fr/
+0310152X;Institut national des sciences appliquées INSA Toulouse;0310152X;1;EBSCO;;;;https://bib.insa-toulouse.fr/
+0370853B;SCD Université  de Tours;0370800U;17;EBSCO;;;;https://math.univ-tours.fr/
+0561779E;SCD Université Bretagne Sud;0561718N;3;EBSCO;;;;https://www.iutvannes.fr/
+0931849E;SCD Université Paris 8;0931827F;4;EBSCO;;;;https://www.bu.univ-paris8.fr/
+0491677G;SCD Université d'Angers;0490970N;2;EBSCO;;;;https://bu.univ-angers.fr/
+0870111Y;SCD de l'Université de Limoges;0870669E;12;EBSCO;;;;https://www.unilim.fr/
+0690246T;Service commun de la documentation, Université Claude Bernard Lyon 1;0691774D;10;EBSCO;;;;https://portaildoc.univ-lyon1.fr/
+0352303N;Université Rennes 2 - Service Commun de Documentation;0350937D;10;EBSCO;;;;https://www.bu.univ-rennes2.fr/
+7200111H;Université de Corse Pasquale Paoli;7200664J;1;EBSCO;;;;https://studia.universita.corsica/
+0352288X;Université de Rennes 1 - Service Commun de la Documentation;0350936C;18;EBSCO;;;;https://bibliotheques.univ-rennes.fr/
+0754945T;Bibliothèque Mazarine;0750005Y;1;Koha;;;https://catalogue.bibliotheques.institutdefrance.fr/cgi-bin/koha;https://www.bibliotheque-mazarine.fr/fr/
+3010001R;Bibliothèque de l'Institut français d'archéologie orientale du Caire;3010001R;1;Koha;;;http://alnadeem-mss.malecso.org/cgi-bin/koha;https://www.ifao.egnet.net/
+0753455Y;Ecole normale supérieure;0753455Y;9;Koha;;;https://catalogue.bib.ens.psl.eu/cgi-bin/koha;https://bib.ens.psl.eu/
+0134031L;SCD Aix-Marseille Université;0134009M;40;Koha;;;https://catalogue.univ-amu.fr/cgi-bin/koha;https://bu.univ-amu.fr/
+0673029D;Service des bibliothèques de l'Université de Strasbourg;0673021V;32;SFX;;;https://bu-sfx.app.unistra.fr/sfx/journalsearch;https://mathinfo.unistra.fr/
+0693783M;BU Jean Moulin Lyon 3;0692437Z;1;non déterminé;;;;https://bu.univ-lyon3.fr/
+0912167L;Bibliothèque Universitaire  - Université d'Evry Val d'Essonne;0911975C;3;non déterminé;;;;https://www.biblio.univ-evry.fr/
+0755355N;Bibliothèque de l'Institut de France;0750005Y;2;non déterminé;;;;https://www.bibliotheque-institutdefrance.fr/
+0754523J;Bibliothèque de l'Université  Panthéon-Assas Paris II;0751718K;0;non déterminé;;;;
+0511121S;Bibliothèque de l'Université de Reims Champagne Ardenne;0511296G;9;non déterminé;;;;https://www.univ-reims.fr/accueil/accueil,1,19021.html
+9830606S;Bibliothèque de l'Université de la Nouvelle Calédonie;9830445S;2;non déterminé;;;;https://bu.unc.nc/
+0751794T;Bibliothèque de l'École française d'Extrême-Orient;0751794T;8;non déterminé;;;;http://www.efeo.fr/
+0671451N;Bibliothèque nationale et universitaire;0671451N;1;non déterminé;;;;https://www.bnu.fr/fr
+0753494R;Bibliothèques du Muséum national d'histoire naturelle;0753494R;1;non déterminé;;;;
+0290323U;Bibliothèques universitaires de l'Université de Bretagne Occidentale - UBO;0290346U;11;non déterminé;;;;http://ubodoc.univ-brest.fr/
+1340004B;Casa de Velázquez;1340004B;1;non déterminé;;;;https://www.casadevelazquez.org/
+0596870X;ESPE LNF / COMUE Lille Nord de France;0596870X;1;non déterminé;;;;
+0692459Y;Ecole nationale supérieure des sciences de l'information et des bibliothèques - enssib;0692459Y;1;non déterminé;;;;https://www.enssib.fr/
+0940607Z;Ecole normale supérieure Paris-Saclay;0940607Z;1;non déterminé;;;;https://ens-paris-saclay.fr/
+0753486G;Ecole pratique des hautes études;0753486G;2;non déterminé;;;;https://www.ephe.psl.eu/
+093GEDCC;Etablissement public Campus Condorcet;0932560C;0;non déterminé;;;;
+0180974L;INSA Centre - Val-de-Loire;0180974L;3;non déterminé;;;;https://www.insa-centrevaldeloire.fr/
+0690192J;INSA Lyon;0690192J;1;non déterminé;;;;http://scd.docinsa.insa-lyon.fr/
+0383225Z;Médiat Rhône-Alpes;0383493R;0;non déterminé;;;;
+0761652H;SCD Université de Rouen-Normandie;0761904G;0;non déterminé;;;;
+0301687W;SCD de l'Université de Nimes;0301687W;2;non déterminé;;;;https://www.unimes.fr/fr/index.html
+0660080D;SCD de l'Université de Perpignan Via Domitia;0660437S;4;non déterminé;;;;http://recerc.eu/
+0731137P;SCDBU Université Savoie Mont Blanc;0730858L;0;non déterminé;;;;
+0720850H;Service Commun de Documentation - Le Mans Université;0720916E;2;non déterminé;;;;http://www.bumaine.fr/
+0450744P;Service Commun de Documentation de l'Université d'Orléans;0450855K;16;non déterminé;;;;https://www.univ-orleans.fr/scd
+0911688R;Service Commun de la Documentation;0911101C;11;non déterminé;;;;https://www.bibliotheques.universite-paris-saclay.fr/
+0752736S;Service Commun de la Documentation (SCD) de l'Université Paris Descartes;0751721N;9;non déterminé;;;;http://www.bu.parisdescartes.fr/
+0595346R;Service commun de documentation de l'Université de Valenciennes et du Hainaut Cambrésis;0593279U;4;non déterminé;;;;https://www.uphf.fr/
+0421523C;Service commun de la documentation;0421095M;5;non déterminé;;;;https://scd.univ-st-etienne.fr/fr/index.html
+0440121T;Service commun de la documentation (SCD) de l’Université de Nantes;0440984F;25;non déterminé;;;;http://www.bu.univ-nantes.fr/
+0753471R;Service commun de la documentation du Conservatoire national des arts et métiers;0753471R;6;non déterminé;;;;https://bibliotheques.cnam.fr/opac/.do
+0693782L;Université Lumière Lyon 2;0691775E;1;non déterminé;;;;http://www.univ-lyon2.fr/
+0060634G;Université Nice Sophia Antipolis;0060931E;0;non déterminé;;;;http://bibliotheque.unice.fr/
+0752735R;Université Paris Sorbonne;0751720M;18;non déterminé;;;;http://documentation.sorbonne-universites.fr/
+0623982S;Université d'Artois;0623957P;7;non déterminé;;;;https://portail-bu.univ-artois.fr/opac/
+0141110F;Université de Caen Normandie - Service commun de la documentation;0141408E;16;non déterminé;;;;https://www.unicaen.fr/
+0680115F;Université de Haute Alsace - Service commun de Documentation;0681166Y;4;non déterminé;;;;http://www.scd.uha.fr/
+9840390B;Université de Polynésie française;9840349G;2;non déterminé;;;;https://www.upf.pf/fr
