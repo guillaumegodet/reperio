@@ -78,6 +78,132 @@
   $("o-une").addEventListener("click", () => choisirOnglet("une"));
   $("o-liste").addEventListener("click", () => choisirOnglet("liste"));
 
+  // ------------------------------------------------------------------ titre → ISSN (OpenAlex)
+  // Suggestions de revues : autocomplétion OpenAlex (titres incomplets acceptés), puis un appel
+  // groupé pour récupérer tous les ISSN des revues proposées.
+  const OPENALEX = "https://api.openalex.org";
+  const RE_ISSN = /^\s*(\d{4})-?(\d{3}[\dXx])\s*$/;
+  const champTitre = $("libelle"), liste = $("suggestions");
+  let propositions = [], active = -1, minuterie = null, controleur = null;
+  const memoire = new Map();
+
+  function fermer() {
+    liste.hidden = true;
+    champTitre.setAttribute("aria-expanded", "false");
+    champTitre.removeAttribute("aria-activedescendant");
+    active = -1;
+  }
+
+  function afficher(items, message) {
+    propositions = items;
+    active = -1;
+    liste.textContent = "";
+    if (!items.length) {
+      const li = document.createElement("li");
+      li.className = "vide";
+      li.textContent = message || "Aucune revue trouvée : saisissez l'ISSN à côté.";
+      liste.appendChild(li);
+    }
+    items.forEach((it, i) => {
+      const li = document.createElement("li");
+      li.id = "sugg-" + i;
+      li.setAttribute("role", "option");
+      li.setAttribute("aria-selected", "false");
+      const t = document.createElement("span");
+      t.className = "t";
+      t.textContent = it.titre;
+      const m = document.createElement("span");
+      m.className = "m";
+      m.textContent = [it.editeur, it.issns.length ? "ISSN " + it.issns.join(", ") : "sans ISSN",
+                       it.articles ? it.articles.toLocaleString("fr-FR") + " articles" : ""]
+                      .filter(Boolean).join(" · ");
+      li.append(t, m);
+      li.addEventListener("mousedown", (ev) => { ev.preventDefault(); choisir(i); });
+      liste.appendChild(li);
+    });
+    liste.hidden = false;
+    champTitre.setAttribute("aria-expanded", "true");
+  }
+
+  function surligner(i) {
+    const lis = liste.querySelectorAll("[role=option]");
+    if (!lis.length) return;
+    active = (i + lis.length) % lis.length;
+    lis.forEach((li, j) => li.setAttribute("aria-selected", String(j === active)));
+    champTitre.setAttribute("aria-activedescendant", lis[active].id);
+    lis[active].scrollIntoView({ block: "nearest" });
+  }
+
+  function choisir(i) {
+    const it = propositions[i];
+    if (!it) return;
+    champTitre.value = it.titre;
+    if (it.issns.length) $("issn").value = it.issns.join(" ");
+    fermer();
+    (it.issns.length ? $("annee") : $("issn")).focus();
+  }
+
+  async function chercher(q) {
+    if (memoire.has(q)) return memoire.get(q);
+    if (controleur) controleur.abort();
+    controleur = new AbortController();
+    const r = await fetch(OPENALEX + "/autocomplete/sources?q=" + encodeURIComponent(q),
+                          { signal: controleur.signal });
+    if (!r.ok) throw new Error("OpenAlex " + r.status);
+    const res = ((await r.json()).results || []).slice(0, 8);
+    const ids = res.map((x) => x.id.split("/").pop());
+    let issns = {};
+    if (ids.length) {
+      const d = await fetch(OPENALEX + "/sources?filter=openalex:" + ids.join("|") +
+                            "&select=id,issn_l,issn&per-page=" + ids.length, { signal: controleur.signal });
+      if (d.ok) {
+        for (const x of (await d.json()).results || []) {
+          const tous = [x.issn_l].concat(x.issn || []).filter(Boolean);
+          issns[x.id] = [...new Set(tous)];
+        }
+      }
+    }
+    const items = res.map((x) => ({
+      titre: x.display_name, editeur: x.hint || "", articles: x.works_count || 0,
+      issns: issns[x.id] || (x.external_id ? [x.external_id] : []),
+    }));
+    memoire.set(q, items);
+    return items;
+  }
+
+  champTitre.addEventListener("input", () => {
+    clearTimeout(minuterie);
+    const q = champTitre.value.trim();
+    const m = RE_ISSN.exec(q);
+    if (m) {                       // un ISSN tapé dans le titre : il va dans le champ ISSN
+      $("issn").value = m[1] + "-" + m[2].toUpperCase();
+      champTitre.value = "";
+      fermer();
+      $("annee").focus();
+      return;
+    }
+    if (q.length < 3) { fermer(); return; }
+    minuterie = setTimeout(async () => {
+      try {
+        const items = await chercher(q);
+        if (champTitre.value.trim() === q) afficher(items);
+      } catch (e) {
+        if (e.name !== "AbortError") afficher([], "Suggestions indisponibles : saisissez l'ISSN à côté.");
+      }
+    }, 250);
+  });
+  champTitre.addEventListener("keydown", (ev) => {
+    if (liste.hidden) {
+      if (ev.key === "ArrowDown" && propositions.length) { afficher(propositions); surligner(0); ev.preventDefault(); }
+      return;
+    }
+    if (ev.key === "ArrowDown") { surligner(active + 1); ev.preventDefault(); }
+    else if (ev.key === "ArrowUp") { surligner(active - 1); ev.preventDefault(); }
+    else if (ev.key === "Enter" && active >= 0) { choisir(active); ev.preventDefault(); }
+    else if (ev.key === "Escape") { fermer(); ev.preventDefault(); }
+  });
+  champTitre.addEventListener("blur", () => setTimeout(fermer, 100));
+
   $("fichier-liste").addEventListener("change", async (ev) => {
     const f = ev.target.files[0];
     ev.target.value = "";
@@ -103,7 +229,11 @@
     if (!pret || enCours) return;
     const texte = texteDemandes();
     if (!texte.trim()) {
-      erreurFormulaire(mode === "une" ? "Indiquez un ISSN et une année." : "La liste est vide.");
+      erreurFormulaire(mode === "liste" ? "La liste est vide."
+        : !$("issn").value.trim() ? (champTitre.value.trim()
+          ? "Choisissez la revue dans les suggestions, ou saisissez son ISSN."
+          : "Indiquez un titre ou un ISSN.")
+        : "Indiquez la ou les années demandées.");
       return;
     }
     const lignes = mode === "liste" ? texte.split(/\n/).filter((l) => l.trim()).length : 1;

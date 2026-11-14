@@ -46,6 +46,7 @@ Options :
 La même chaîne tourne dans le navigateur, sans rien installer : https://guillaumegodet.github.io/reperio/
 
 - Le code Python du dépôt s'exécute dans la page grâce à [Pyodide](https://pyodide.org) (environ 10 Mo téléchargés à la première visite). Les requêtes partent du navigateur : le Sudoc, BACON, ISTEX, OpenAlex, Mir@bel et les résolveurs Alma l'autorisent tous (en-têtes CORS).
+- On cherche une revue par son titre : les suggestions viennent de l'autocomplétion d'OpenAlex (titres incomplets acceptés) et remplissent le champ ISSN avec tous les ISSN de la revue. On peut aussi saisir l'ISSN directement.
 - Le cache des réponses (une semaine) est gardé dans le navigateur.
 - **L'index des fonds de Nantes n'est pas publié** (le dépôt et la page sont publics). Chaque collègue récupère `fonds_nantes.json.gz` dans le dossier partagé Uncloud de Repério et le charge une fois dans la page ; il reste dans son navigateur. Le lien du dossier Uncloud circule par courriel, jamais dans ce dépôt.
 - La clé d'API OpenAlex n'est jamais envoyée par la page.

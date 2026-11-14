@@ -74,3 +74,19 @@ footer a { color: var(--accent); }
   .bouton { width: 100%; justify-content: center; }
   .actions { flex-direction: column; align-items: stretch; }
 }
+
+/* Recherche par titre : suggestions de revues (OpenAlex) */
+.champs.une-revue { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+.combo { position: relative; }
+#suggestions { position: absolute; z-index: 10; left: 0; right: 0; top: calc(100% + 4px); margin: 0; padding: 4px;
+  list-style: none; background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .12); max-height: 340px; overflow-y: auto; }
+#suggestions li { padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+#suggestions li[aria-selected="true"], #suggestions li:hover { background: var(--chip); }
+#suggestions .t { display: block; font-weight: 600; }
+#suggestions .m { display: block; color: var(--muted); font-size: .85rem; }
+#suggestions .vide { color: var(--muted); cursor: default; }
+.aide-champ { color: var(--muted); font-size: .82rem; margin: 4px 0 0; }
+@media (max-width: 640px) {
+  .champs.une-revue { grid-template-columns: 1fr; }
+}

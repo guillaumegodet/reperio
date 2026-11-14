@@ -81,13 +81,21 @@
     </div>
     <form id="formulaire" novalidate>
       <div role="tabpanel" id="p-une" aria-labelledby="o-une">
-        <div class="champs">
+        <div class="champs une-revue">
+          <div class="champ-titre">
+            <label for="libelle">Titre de la revue</label>
+            <div class="combo">
+              <input id="libelle" role="combobox" aria-autocomplete="list" aria-expanded="false"
+                     aria-controls="suggestions" aria-describedby="aide-titre" autocomplete="off"
+                     placeholder="Caries research, presse médicale…" spellcheck="false">
+              <ul id="suggestions" role="listbox" aria-label="Revues suggérées" hidden></ul>
+            </div>
+            <p class="aide-champ" id="aide-titre">Choisissez une revue pour remplir l'ISSN, ou tapez directement l'ISSN à côté.</p>
+          </div>
           <label>ISSN <span class="muet">(un seul suffit)</span>
             <input id="issn" inputmode="text" autocomplete="off" placeholder="0008-6568" spellcheck="false"></label>
           <label>Année(s)
-            <input id="annee" autocomplete="off" placeholder="2016, 2016 2018 ou 2016-2018"></label>
-          <label class="large">Titre <span class="muet">(facultatif, pour le rapport)</span>
-            <input id="libelle" autocomplete="off" placeholder="Caries research"></label>
+            <input id="annee" autocomplete="off" placeholder="2016 ou 2016-2018"></label>
         </div>
       </div>
       <div role="tabpanel" id="p-liste" aria-labelledby="o-liste" hidden>
