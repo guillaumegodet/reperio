@@ -45,6 +45,7 @@ Cinq phases, chacune utilisable seule : le PEB gagne du temps dès la phase 1.
    - Critère de fin : sur le jeu de test, au moins 90 % des localisations papier trouvées à la main sont aussi trouvées par l'outil.
 3. **Phase 2 — Accès local, libre et national.** Vérifier d'abord si Nantes Université donne déjà accès à l'année (export Nantilus, `peb_nantes.py`), puis si l'année est en libre accès (Unpaywall/OpenAlex, DOAJ, Mir@bel) ou couverte par les Licences nationales / ISTEX (BACON). Si oui, la demande s'arrête là.
    - Fait le 14/11/2026 : prototype de l'étape Nantes, branché dans `reperio.py` (index de 77 000 ISSN tiré de l'export du 01/07/2026).
+   - Fait le 14/11/2026 : Mir@bel interrogé par son API (`peb_acces.py`). Il qualifie le libre accès des revues de SHS plateforme par plateforme (Cairn, OpenEdition, Persée…), barrière mobile comprise, et signale les accès lacunaires ou partiels. Ce n'est pas une source de localisation : les fonds déclarés par les partenaires ne sont lisibles qu'avec leur clé privée.
    - Reste : obtenir un export récent et un rythme de mise à jour (voir Organisation) ; comparer sur le jeu de test les accès annoncés et les accès réels.
    - Critère de fin : part des demandes résolues sans PEB mesurée sur le jeu de test, en distinguant « déjà à Nantes » et « libre ou national ».
 4. **Phase 3 — Résolveurs de liens des BU prioritaires.** Constituer la table de configuration (BU → type de résolveur → URL → code institution), puis interroger chaque résolveur par OpenURL (ISSN + année). Commencer par les 20 BU prioritaires.

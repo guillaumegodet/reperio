@@ -3,7 +3,7 @@
 Repério (*repérer* + *périodique*) est une preuve de concept. Elle répond à une question : pour une revue et une année, où la trouver ? Elle enchaîne quatre étapes, chacune correspondant à une phase du plan.
 
 0. **Fonds de Nantes Université (étape 0).** Elle vérifie d'abord si Nantes Université donne déjà accès à l'année demandée (abonnement, archives, Licence nationale activée, bouquet libre), d'après l'export du catalogue Nantilus. Si oui, pas de PEB.
-1. **Accès sans PEB (phase 2).** Elle cherche si l'année est en libre accès (OpenAlex, DOAJ), couverte par une Licence nationale (BACON) ou présente dans ISTEX.
+1. **Accès sans PEB (phase 2).** Elle cherche si l'année est en libre accès (OpenAlex, DOAJ, et Mir@bel plateforme par plateforme pour les revues de SHS), couverte par une Licence nationale (BACON) ou présente dans ISTEX.
 2. **Sudoc (phase 1).** Elle lit les états de collection papier et électronique déclarés dans le Sudoc.
 3. **Résolveurs (phase 3).** Elle interroge les résolveurs de liens des BU prioritaires.
 
@@ -135,7 +135,8 @@ Les BU non interrogées automatiquement restent couvertes par le Sudoc.
 ## Limites connues
 
 - **Clauses PEB des licences électroniques :** elles ne sont pas publiées par les résolveurs. La colonne PEB indique « clause PEB à vérifier ».
-- **Libre accès « signalé » :** les lignes signalées par Mir@bel, ou marquées comme contenu offert dans un bouquet payant, ne couvrent souvent qu'une partie des articles. Elles n'arrêtent pas la demande.
+- **Libre accès « signalé » :** les lignes marquées comme contenu offert dans un bouquet payant ne couvrent souvent qu'une partie des articles. Elles n'arrêtent pas la demande. Mir@bel est interrogé directement par son API : un accès libre en texte intégral, sans lacune ni sélection d'articles, arrête la demande ; sinon il reste « à vérifier ». Les lignes MIRABEL_* de BACON ne servent plus que de repli si l'API ne répond pas.
+- **Mir@bel :** il couvre surtout les revues de SHS et francophones (Cairn, OpenEdition, Persée, Érudit), peu la médecine. Ses données sont sous Licence Ouverte : citer Mir@bel en cas de réutilisation.
 - **Repérage des hôpitaux :** il se fait d'après le nom court de la bibliothèque et devra être affiné.
 - **Dates de publication :** beaucoup de notices de périodiques n'ont pas de zone 100. Les dates des titres liés sont alors estimées à partir de leurs successeurs ou prédécesseurs.
 - **Export Nantilus :** il n'est pas mis à jour automatiquement. Un abonnement arrêté après l'export apparaît encore « en cours ». La base de connaissances décrit ce que Nantes déclare, pas les droits réels ; les écarts se vérifient sur le jeu de test.

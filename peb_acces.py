@@ -3,6 +3,7 @@
 peb_acces.py — Phase 2 : l'année demandée est-elle accessible sans PEB ?
 
     - libre accès : OpenAlex (part des articles de l'année en accès ouvert, revue au DOAJ)
+    - libre accès qualifié par plateforme (Cairn, OpenEdition, Persée, Érudit…) : Mir@bel
     - Licences nationales et bouquets libres : BACON (ABES), ISTEX
 
 Usage seul :
@@ -11,6 +12,7 @@ Usage seul :
 Sources (publiques, sans clé) :
     https://api.openalex.org/sources/issn:{issn}
     https://api.openalex.org/works?filter=...&group_by=open_access.is_oa
+    https://reseau-mirabel.info/api/acces/titres?issn={issn}   (Licence Ouverte, citer Mir@bel)
     https://bacon.abes.fr/id2kbart/{issn}.json
     https://api.istex.fr/document/?q=...
 """
@@ -111,6 +113,52 @@ def bacon(issns, annee):
     return res
 
 
+def mirabel(issns, annee):
+    """Accès en texte intégral signalés par Mir@bel pour l'année.
+
+    Renvoie [{ressource, couverture, barriere, diffusion, complet, url}], ou None si l'API n'a pas répondu
+    (les lignes MIRABEL_* de BACON servent alors de repli). `complet` = ni lacunaire, ni sélection
+    d'articles : un accès libre complet suffit à éviter le PEB.
+    """
+    res, vus, echec = [], set(), False
+    for issn in issns:
+        try:
+            txt = get(f"https://reseau-mirabel.info/api/acces/titres?issn={issn}")
+        except RuntimeError:
+            echec = True
+            continue
+        try:
+            acces = json.loads(txt) if txt else []      # 404 = titre absent de Mir@bel
+        except ValueError:
+            echec = True
+            continue
+        for a in acces if isinstance(acces, list) else []:
+            if a.get("id") in vus or a.get("contenu") != "Intégral":
+                continue
+            vus.add(a.get("id"))
+            debut = str(a.get("datedebut") or "")[:4]
+            fin = str(a.get("datefin") or "")[:4]
+            if not debut.isdigit() or annee < int(debut):
+                continue
+            if fin.isdigit():
+                if annee > int(fin):
+                    continue
+            else:
+                # datefin est normalement calculée par Mir@bel ; repli sur l'embargo KBART
+                emb = _embargo_annee(a.get("embargoinfo") or "")
+                if emb is not None and annee > emb:
+                    continue
+            res.append({
+                "ressource": a.get("ressource") or "?",
+                "couverture": f"{debut}-{fin or '....'}",
+                "barriere": a.get("dateinfo") or "",
+                "diffusion": a.get("diffusion") or "",
+                "complet": not a.get("lacunaire") and not a.get("selection"),
+                "url": a.get("url") or "",
+            })
+    return None if echec and not res else res
+
+
 def istex(issns, annee):
     q = " OR ".join(f'host.issn:"{i}" OR host.eissn:"{i}"' for i in issns)
     try:
@@ -145,7 +193,25 @@ def evaluer(libelle, issns, annee):
               f"{oa}/{total} articles ({part:.0%})", "OpenAlex",
               detail="vérifier l'article demandé (DOI) dans Unpaywall / OpenAlex")
 
+    acces_mirabel = mirabel(issns, annee)
+    for a in acces_mirabel or []:
+        detail = f"{a['ressource']} (Mir@bel)" + (f" — {a['barriere'].lower()}" if a["barriere"] else "")
+        if a["diffusion"] == "libre" and a["complet"]:
+            verdicts.append(f"libre accès sur {a['ressource']} ({a['couverture']}, Mir@bel)")
+            ligne("libre accès", "haute", f"Accès libre : {a['ressource']}", a["couverture"],
+                  "Mir@bel", a["url"], detail)
+        elif a["diffusion"] == "libre":
+            ligne("libre accès à vérifier", "moyenne", f"Accès libre partiel : {a['ressource']}",
+                  a["couverture"], "Mir@bel", a["url"],
+                  f"{detail} — numéros manquants ou sélection d'articles")
+        else:
+            ligne("présent dans un bouquet", "faible",
+                  f"Plateforme payante : {a['ressource']} (BU abonnées : voir résolveurs)",
+                  a["couverture"], "Mir@bel", a["url"], detail)
+
     for paquet, couv, nature, url in bacon(issns, annee):
+        if acces_mirabel is not None and paquet.upper().startswith("MIRABEL"):
+            continue          # déjà lu, plus finement, dans l'API Mir@bel
         if nature == "Licence nationale":
             verdicts.append(f"Licence nationale ({couv}, BACON)")
             ligne("Licence nationale", "haute", "Licence nationale (établissements ayants droit)",
