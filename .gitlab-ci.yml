@@ -1,0 +1,36 @@
+# Repério sur le GitLab de Nantes Université (équivalent de .github/workflows/).
+#
+# - pages : publie la page de test (GitLab Pages) à chaque push sur la branche par défaut.
+#   Le site = web/ + les modules Python copiés dans py/ (exécutés dans le navigateur par Pyodide).
+#   L'index des fonds de Nantes n'est PAS publié : chaque utilisateur le charge depuis Uncloud.
+# - resolveurs : vérifie que les résolveurs Alma répondent toujours. À lancer par une
+#   planification mensuelle (Compilation > Planifications de pipelines) ou à la main.
+
+stages:
+  - test
+  - deploy
+
+pages:
+  stage: deploy
+  image: python:3.12-alpine
+  script:
+    - mkdir -p public/py
+    - cp -r web/. public/
+    - cp peb_sudoc.py peb_acces.py peb_resolveurs.py peb_nantes.py reperio.py resolveurs.csv public/py/
+    - python -c "import ast, sys; [ast.parse(open(f, encoding='utf-8').read(), f) for f in sys.argv[1:]]" public/py/*.py
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+resolveurs:
+  stage: test
+  image: python:3.12-alpine
+  script:
+    - python peb_resolveurs.py --test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"

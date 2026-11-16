@@ -50,7 +50,7 @@ La même chaîne tourne dans le navigateur, sans rien installer : https://guilla
 - Le cache des réponses (une semaine) est gardé dans le navigateur.
 - **L'index des fonds de Nantes n'est pas publié** (le dépôt et la page sont publics). Chaque collègue récupère `fonds_nantes.json.gz` dans le dossier partagé Uncloud de Repério et le charge une fois dans la page ; il reste dans son navigateur. Le lien du dossier Uncloud circule par courriel, jamais dans ce dépôt.
 - La clé d'API OpenAlex n'est jamais envoyée par la page.
-- La page est publiée par `.github/workflows/pages.yml` à chaque push sur `main` (dossier `web/` + modules Python copiés dans `py/`).
+- La page est publiée à chaque push sur la branche par défaut (dossier `web/` + modules Python copiés dans `py/`) : par `.github/workflows/pages.yml` sur GitHub, par le job `pages` de `.gitlab-ci.yml` sur le GitLab de Nantes Université. Sur GitLab, le job `resolveurs` vérifie les résolveurs : il se lance par une planification mensuelle ou à la main.
 
 Pour l'essayer en local : copier `web/*` dans un dossier, les fichiers `peb_*.py`, `reperio.py` et `resolveurs.csv` dans son sous-dossier `py/`, puis `python -m http.server` dans ce dossier.
 
