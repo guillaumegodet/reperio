@@ -112,6 +112,24 @@ def lien_catalogue(conf, issn):
     return modele.replace("{issn}", urllib.parse.quote(issn)) if modele else ""
 
 
+def a_consulter(issn, config=None):
+    """Catalogues sans résolveur interrogeable (EBSCO Publication Finder, Summon, SebinaYOU…) :
+    liens de recherche par ISSN à ouvrir à la main, dans l'ordre de consultation de l'équipe PEB
+    (colonne ordre_peb), puis les autres BU prioritaires qui ont un lien."""
+    vus, liens = set(), []
+    for conf in config or charger_config():
+        if conf["type"] in ("alma", "hlm") and conf["statut"] == "actif" or not (conf.get("catalogue") or "").strip():
+            continue
+        url = lien_catalogue(conf, issn)
+        if url in vus:          # Lyon 1 : deux RCR, un seul catalogue
+            continue
+        vus.add(url)
+        liens.append({"etablissement": conf["etablissement"], "systeme": conf["type"], "url": url,
+                      "ordre": int(conf.get("ordre_peb") or 999),
+                      "prioritaire": conf.get("prioritaire", "oui") == "oui"})
+    return sorted(liens, key=lambda l: (l["ordre"], not l["prioritaire"], l["etablissement"]))
+
+
 def interroger(libelle, issns, annee, config=None):
     """Lignes au format commun pour toutes les BU actives de la configuration."""
     config = config or charger_config()

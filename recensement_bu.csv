@@ -23,12 +23,12 @@ siege_id;siege;uai_etablissement;nb_rcr;systeme;institution_alma;hote_alma;catal
 0921510S;Service Commun de Documentation de l'Université Paris Nanterre;0921204J;3;Primo, code introuvable;;;http://primo-prod.parisnanterre.fr;https://bu.parisnanterre.fr/
 9740064B;Service commun de documentation - Université de La Réunion;9740478B;2;Primo, code introuvable;;;http://primo4-test.univ-reunion.fr;https://bu.univ-reunion.fr/
 0900441R;UNIVERSITÉ DE TECHNOLOGIE DE BELFORT-MONTBÉLIARD;0900424X;1;Primo, code introuvable;;;https://utbm.primo.exlibrisgroup.com/mng/login;http://www2.utbm.fr/
-0783398V;Université de Versailles Saint-Quentin-en-Yvelines , Direction des bibliothèques et de l'Information Scientifique et Technique;0781944P;3;Primo, code introuvable;;;https://33pup-primo4alma.hosted.exlibrisgroup.com;https://www.bib.uvsq.fr/
+0783398V;Université de Versailles Saint-Quentin-en-Yvelines , Direction des bibliothèques et de l'Information Scientifique et Technique;0781944P;3;Alma/Primo, résolveur public (réseau Paris-Saclay);33PUP_INST;eu03;https://33pup-primo4alma.hosted.exlibrisgroup.com;https://www.bib.uvsq.fr/
 0841028L;Bibliothèque Universitaire de l'Université d'Avignon et des pays de Vaucluse;0840685N;2;EBSCO;;;;https://bu.univ-avignon.fr/
 0752705H;Bibliothèque interuniversitaire de la Sorbonne;0751717J;2;EBSCO;;;;https://bibliotheques.pantheonsorbonne.fr/
 0755040W;Bibliothèque universitaire des langues et civilisations;0752148C;1;EBSCO;;;;https://www.bulac.fr/
 0310152X;Institut national des sciences appliquées INSA Toulouse;0310152X;1;EBSCO;;;;https://bib.insa-toulouse.fr/
-0370853B;SCD Université  de Tours;0370800U;17;EBSCO;;;;https://math.univ-tours.fr/
+0370853B;SCD Université  de Tours;0370800U;17;EBSCO, Summon;;;https://univtours.summon.serialssolutions.com;https://math.univ-tours.fr/
 0561779E;SCD Université Bretagne Sud;0561718N;3;EBSCO;;;;https://www.iutvannes.fr/
 0931849E;SCD Université Paris 8;0931827F;4;EBSCO;;;;https://www.bu.univ-paris8.fr/
 0491677G;SCD Université d'Angers;0490970N;2;EBSCO;;;;https://bu.univ-angers.fr/
@@ -40,13 +40,13 @@ siege_id;siege;uai_etablissement;nb_rcr;systeme;institution_alma;hote_alma;catal
 0754945T;Bibliothèque Mazarine;0750005Y;1;Koha;;;https://catalogue.bibliotheques.institutdefrance.fr/cgi-bin/koha;https://www.bibliotheque-mazarine.fr/fr/
 3010001R;Bibliothèque de l'Institut français d'archéologie orientale du Caire;3010001R;1;Koha;;;http://alnadeem-mss.malecso.org/cgi-bin/koha;https://www.ifao.egnet.net/
 0753455Y;Ecole normale supérieure;0753455Y;9;Koha;;;https://catalogue.bib.ens.psl.eu/cgi-bin/koha;https://bib.ens.psl.eu/
-0134031L;SCD Aix-Marseille Université;0134009M;40;Koha;;;https://catalogue.univ-amu.fr/cgi-bin/koha;https://bu.univ-amu.fr/
-0673029D;Service des bibliothèques de l'Université de Strasbourg;0673021V;32;SFX;;;https://bu-sfx.app.unistra.fr/sfx/journalsearch;https://mathinfo.unistra.fr/
+0134031L;SCD Aix-Marseille Université;0134009M;40;Koha, Summon;;;https://univ-amu.summon.serialssolutions.com;https://bu.univ-amu.fr/
+0673029D;Service des bibliothèques de l'Université de Strasbourg;0673021V;32;SFX, SebinaYOU;;;https://bu.unistra.fr/opac/;https://mathinfo.unistra.fr/
 0693783M;BU Jean Moulin Lyon 3;0692437Z;1;non déterminé;;;;https://bu.univ-lyon3.fr/
 0912167L;Bibliothèque Universitaire  - Université d'Evry Val d'Essonne;0911975C;3;non déterminé;;;;https://www.biblio.univ-evry.fr/
 0755355N;Bibliothèque de l'Institut de France;0750005Y;2;non déterminé;;;;https://www.bibliotheque-institutdefrance.fr/
 0754523J;Bibliothèque de l'Université  Panthéon-Assas Paris II;0751718K;0;non déterminé;;;;
-0511121S;Bibliothèque de l'Université de Reims Champagne Ardenne;0511296G;9;non déterminé;;;;https://www.univ-reims.fr/accueil/accueil,1,19021.html
+0511121S;Bibliothèque de l'Université de Reims Champagne Ardenne;0511296G;9;EBSCO;;;https://publications.ebsco.com/?custId=s6957376&groupId=main&profileId=pfui;https://www.univ-reims.fr/accueil/accueil,1,19021.html
 9830606S;Bibliothèque de l'Université de la Nouvelle Calédonie;9830445S;2;non déterminé;;;;https://bu.unc.nc/
 0751794T;Bibliothèque de l'École française d'Extrême-Orient;0751794T;8;non déterminé;;;;http://www.efeo.fr/
 0671451N;Bibliothèque nationale et universitaire;0671451N;1;non déterminé;;;;https://www.bnu.fr/fr
@@ -67,7 +67,7 @@ siege_id;siege;uai_etablissement;nb_rcr;systeme;institution_alma;hote_alma;catal
 0731137P;SCDBU Université Savoie Mont Blanc;0730858L;0;non déterminé;;;;
 0720850H;Service Commun de Documentation - Le Mans Université;0720916E;2;non déterminé;;;;http://www.bumaine.fr/
 0450744P;Service Commun de Documentation de l'Université d'Orléans;0450855K;16;non déterminé;;;;https://www.univ-orleans.fr/scd
-0911688R;Service Commun de la Documentation;0911101C;11;non déterminé;;;;https://www.bibliotheques.universite-paris-saclay.fr/
+0911688R;Service Commun de la Documentation;0911101C;11;Alma/Primo, résolveur public;33PUP_INST;eu03;https://upsaclay.focus.universite-paris-saclay.fr;https://www.bibliotheques.universite-paris-saclay.fr/
 0752736S;Service Commun de la Documentation (SCD) de l'Université Paris Descartes;0751721N;9;non déterminé;;;;http://www.bu.parisdescartes.fr/
 0595346R;Service commun de documentation de l'Université de Valenciennes et du Hainaut Cambrésis;0593279U;4;non déterminé;;;;https://www.uphf.fr/
 0421523C;Service commun de la documentation;0421095M;5;non déterminé;;;;https://scd.univ-st-etienne.fr/fr/index.html
@@ -77,6 +77,6 @@ siege_id;siege;uai_etablissement;nb_rcr;systeme;institution_alma;hote_alma;catal
 0060634G;Université Nice Sophia Antipolis;0060931E;0;non déterminé;;;;http://bibliotheque.unice.fr/
 0752735R;Université Paris Sorbonne;0751720M;18;non déterminé;;;;http://documentation.sorbonne-universites.fr/
 0623982S;Université d'Artois;0623957P;7;non déterminé;;;;https://portail-bu.univ-artois.fr/opac/
-0141110F;Université de Caen Normandie - Service commun de la documentation;0141408E;16;non déterminé;;;;https://www.unicaen.fr/
+0141110F;Université de Caen Normandie - Service commun de la documentation;0141408E;16;Alma/Primo, résolveur public;33PNU_UDC_INST;eu01;https://catalogue.unicaen.fr;https://www.unicaen.fr/
 0680115F;Université de Haute Alsace - Service commun de Documentation;0681166Y;4;non déterminé;;;;http://www.scd.uha.fr/
 9840390B;Université de Polynésie française;9840349G;2;non déterminé;;;;https://www.upf.pf/fr

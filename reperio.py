@@ -69,6 +69,7 @@ def traiter_par_etapes(libelle, issns, annee, sans_hopitaux, prio):
     return {"libelle": libelle, "annee": annee, "issns": tous_issns, "verdict_nantes": verdict_nantes,
             "nantes": nantes, "verdict": verdict,
             "acces": acces, "localisations": localisations, "etat": etat,
+            "a_consulter": peb_resolveurs.a_consulter(issns[0] if issns else tous_issns[0]),
             "duree": time.time() - t0}
 
 
@@ -173,6 +174,16 @@ def rapport_html(resultats, chemin):
                 parts.append(f"<tr><td>{_e(l['bibliotheque'])}</td><td>{_e(l['statut'])}</td>"
                              f"<td>{_e(l['couverture'])}</td><td>{_lien(l)}</td><td class='muted'>{_e(l['detail'])}</td></tr>")
             parts.append("</tbody></table></div></details>")
+        manuels = r.get("a_consulter") or []
+        if manuels:
+            noms = {"ebsco": "EBSCO", "summon": "Summon", "sebina": "SebinaYOU"}
+            parts.append(f"<details><summary>Catalogues à consulter à la main ({len(manuels)})</summary>"
+                         "<p class='muted'>Pas de résolveur interrogeable : le lien ouvre le catalogue, "
+                         "recherche par ISSN déjà remplie quand le catalogue le permet.</p><ul>")
+            for m in manuels:
+                parts.append(f"<li><a href='{_e(m['url'])}' target='_blank' rel='noopener'>{_e(m['etablissement'])}</a>"
+                             f" <span class='muted'>{_e(noms.get(m['systeme'], ''))}</span></li>")
+            parts.append("</ul></details>")
         non = [f"{k} ({v})" for k, v in r["etat"].items() if v != "interrogé"]
         if non:
             parts.append(f"<details><summary>BU prioritaires non interrogées automatiquement ({len(non)})</summary>"

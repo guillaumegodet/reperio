@@ -68,7 +68,7 @@ Mettre à jour l'index pour les collègues : `python peb_nantes.py --indexer <no
 | `web/` | Page de test (GitHub Pages) : interface, worker Pyodide |
 | `logo/` | Logo (SVG fixes, animé, favicon) et `generer_logo.py` qui les régénère |
 | `recensement_bu.csv` | Recensement des 81 services documentaires de l'ESR : système, catalogue, code Alma |
-| `resolveurs.csv` | Table de configuration des résolveurs, une ligne par BU prioritaire |
+| `resolveurs.csv` | Table de configuration des résolveurs et des catalogues à consulter à la main |
 | `bu-prio.csv` | Liste des BU prioritaires transmise par l'équipe PEB |
 
 ## Fonds de Nantes Université : l'export HLM de Nantilus
@@ -111,6 +111,8 @@ python peb_resolveurs.py --test
 
 Les liens ouvrent des pages publiques, sans connexion : la recherche par ISSN dans le catalogue de la BU (Primo pour les résolveurs Alma, Nantilus pour Nantes), la notice du Sudoc, le site de l'éditeur, ISTEX ou Mir@bel. Les liens fournis par les résolveurs passent par le proxy et le CAS de chaque établissement : ils ne servent pas à un collègue extérieur. Les adresses des catalogues sont dans la colonne `catalogue` de `resolveurs.csv`, avec `{issn}` à la place de l'ISSN.
 
+Le rapport se termine par la rubrique « Catalogues à consulter à la main » : les établissements sans résolveur interrogeable, avec un lien vers leur catalogue où la recherche par ISSN est déjà remplie quand c'est possible (EBSCO Publication Finder, Summon). Ils sont classés dans l'ordre de consultation de l'équipe PEB (colonne `ordre_peb`, voir plus bas).
+
 ### Niveaux de confiance
 
 | Confiance | Signification |
@@ -133,7 +135,7 @@ Sans code, le Sudoc considère l'exemplaire comme disponible pour le PEB.
 
 ## Couverture des BU prioritaires
 
-Sur les 18 RCR de la liste, 9 BU sont interrogées automatiquement : 8 par 7 résolveurs Alma publics (Montpellier sert à la fois l'odontologie et Nîmes), et Nantes par l'export HLM de Nantilus.
+Sur les 18 RCR de la liste, 10 BU sont interrogées automatiquement : 9 par 8 résolveurs Alma publics (Montpellier sert à la fois l'odontologie et Nîmes), et Nantes par l'export HLM de Nantilus. Lyon 1, Limoges, Rennes et Reims ont un EBSCO Publication Finder ouvert aux invités : Repério ne l'interroge pas, mais donne le lien de recherche par ISSN.
 
 | BU | Établissement | Code Alma | Statut |
 | --- | --- | --- | --- |
@@ -144,20 +146,49 @@ Sur les 18 RCR de la liste, 9 BU sont interrogées automatiquement : 8 par 7 ré
 | BU Médecine (Nîmes) | Université de Montpellier | `33MON_INST` | interrogée |
 | BU Sciences du Vivant et de la Santé | Université de Bordeaux | `33PUDB_UB` | interrogée |
 | BU Santé - Learning Center (Loos) | Université de Lille | `33UDLILLE_INST` | interrogée |
-| BU Odontologie, Lyon Sud, Rockefeller | Université Lyon 1 | — | EBSCO, authentification requise |
-| BU Santé (Limoges) | Université de Limoges | — | EBSCO, authentification requise |
-| BU Santé (Rennes) | Université de Rennes | — | EBSCO, authentification requise |
+| BU Odontologie, Lyon Sud, Rockefeller | Université Lyon 1 | — | lien EBSCO Publication Finder (`s2941747`) |
+| BU Santé (Limoges) | Université de Limoges | — | lien EBSCO Publication Finder (`s4262730`) |
+| BU Santé (Rennes) | Université de Rennes | — | lien EBSCO Publication Finder (`s5189289`) |
 | BU Santé UBO (Brest) | Université de Bretagne Occidentale | — | EBSCO, authentification requise |
 | Pôle Pharmacie-Biologie-Cosmétologie (Paris) | Université Paris Cité | `33USPC_UPDE` (eu00) | interrogée |
 | BU Santé (Nantes) | Nantes Université | — | export HLM Nantilus (`peb_nantes.py`) |
 | BU Tampon | Université de La Réunion | — | Résolveur à identifier |
-| Bibliothèque du Pôle Santé (Reims) | Université de Reims Champagne-Ardenne | — | Résolveur à identifier |
+| Bibliothèque du Pôle Santé (Reims) | Université de Reims Champagne-Ardenne | — | lien EBSCO Publication Finder (`s6957376`) |
 | BU Santé (Saint-Priest-en-Jarez) | Université Jean Monnet Saint-Étienne | — | Résolveur à identifier |
-| BU Madeleine Brès (Caen) | Université de Caen Normandie | — | Résolveur à identifier |
+| BU Madeleine Brès (Caen) | Université de Caen Normandie | `33PNU_UDC_INST` (eu01) | interrogée |
 
 La BU Odontologie, d'une part, et Lyon Sud et Rockefeller, d'autre part, ont deux RCR distincts à Lyon 1.
 
 Les BU non interrogées automatiquement restent couvertes par le Sudoc.
+
+## Catalogues consultés par l'équipe PEB
+
+Le 19/11/2026, l'équipe PEB a transmis les 18 catalogues qu'elle ouvre en priorité pour chercher une revue électronique. Leur rang est dans la colonne `ordre_peb` de `resolveurs.csv`.
+
+| Rang | Établissement | Dans Repério |
+| --- | --- | --- |
+| 1 | Université d'Angers | lien vers le site de la BU (outil de recherche non identifié) |
+| 2 | Université de Caen Normandie | résolveur Alma `33PNU_UDC_INST` (eu01), ajouté |
+| 3 | Université Grenoble Alpes | résolveur Alma `33UGRENOBLE_INST` |
+| 4 | Université de Lille | résolveur Alma `33UDLILLE_INST` |
+| 5 | Université Lyon 1 | lien EBSCO Publication Finder |
+| 6 | Université Paris Cité (santé) | résolveur Alma `33USPC_UPDE` |
+| 7 | Université de Reims Champagne-Ardenne | lien EBSCO Publication Finder |
+| 8 | Université de Rennes | lien EBSCO Publication Finder |
+| 9 | Université Paris-Saclay | résolveur Alma `33PUP_INST` (eu03), ajouté |
+| 10 | Université de Strasbourg | lien vers le catalogue SebinaYOU (« En ligne : Unistra »), sans ISSN prérempli |
+| 11 | Université de Tours | lien Summon |
+| 12 | Université de Franche-Comté | résolveur Alma `33UFC_INST` |
+| 13 | Université Bordeaux Montaigne | résolveur Alma `33PUDB_UBM` (eu02), ajouté |
+| 14 | Université Clermont Auvergne (BCIU) | résolveur Alma `33CLERMONT_BCIU` (eu02), ajouté |
+| 15 | Université de Limoges | lien EBSCO Publication Finder |
+| 16 | Aix-Marseille Université | lien Summon |
+| 17 | Université de Montpellier | résolveur Alma `33MON_INST` |
+| 18 | Université de Toulouse (réseau Archipel) | résolveur Alma `33TOULOUSE_INST` (eu02), ajouté |
+
+Le résolveur `33PUP_INST` sert tout le réseau Paris-Saclay (Versailles Saint-Quentin compris) ; `33TOULOUSE_INST` sert tout le réseau Archipel. Les liens vers les catalogues reprennent les vues utilisées par l'équipe PEB.
+
+EBSCO Publication Finder et Summon s'affichent sans connexion, mais n'offrent pas de résolveur public : Repério ne les interroge pas.
 
 ## Autres établissements de l'enseignement supérieur
 
@@ -167,16 +198,16 @@ Recensement du 14/11/2026, à partir du jeu [Bibliothèques de l'Enseignement su
 
 | Système | Établissements | Dans Repério |
 | --- | --- | --- |
-| Alma / Primo, résolveur public | 18 | oui (19 lignes : Montpellier sert deux BU prioritaires) |
+| Alma / Primo, résolveur public | 18 + 5 | oui (19 lignes : Montpellier sert deux BU prioritaires) ; 5 ajoutés le 19/11/2026 d'après la liste de l'équipe PEB (Caen, Paris-Saclay, Bordeaux Montaigne, Clermont Auvergne, Toulouse) |
 | Primo repéré, mais code ou résolveur introuvable | 7 | non : Arts et Métiers, UTBM, Versailles Saint-Quentin, Paris Nanterre, La Réunion, La contemporaine, École française de Rome |
-| EBSCO (EDS, Publication Finder) | 13 | non : authentification requise ; Nantes passe par son export |
+| EBSCO (EDS, Publication Finder) | 13 | non interrogés ; Nantes passe par son export ; lien de recherche pour Lyon 1, Limoges, Rennes et Reims |
 | Koha, SFX, autres | 5 | non |
 | Non déterminé | 38 | non (adresse de 2018 périmée, petite bibliothèque, catalogue non lié depuis le site) |
 
 Établissements ajoutés : Le Havre, Grenoble Alpes, Paris-Est Créteil, Littoral Côte d'Opale, Poitiers, Sorbonne Nouvelle, Collège de France, Pau et Pays de l'Adour, Antilles, Bibliothèque Cujas, Toulon. 
 Le détail par service documentaire est dans `recensement_bu.csv` (système repéré, catalogue, code et serveur Alma) : c'est la liste de travail pour compléter `resolveurs.csv`.
 
-Les 19 résolveurs sont interrogés en parallèle (8 requêtes à la fois) : une recherche ne prend pas plus de temps qu'avec 7.
+Les 23 résolveurs (24 lignes) sont interrogés en parallèle (8 requêtes à la fois) : une recherche ne prend pas plus de temps qu'avec 7.
 
 ## Limites connues
 
