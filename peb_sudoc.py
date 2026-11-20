@@ -94,7 +94,11 @@ def _telecharger_urllib(url):
     req = urllib.request.Request(url, headers=UA)
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
-            return r.status, r.read().decode("utf-8")
+            brut = r.read()
+            try:                      # UTF-8 d'abord : certains serveurs (SFX) annoncent ISO-8859-1 à tort
+                return r.status, brut.decode("utf-8")
+            except UnicodeDecodeError:
+                return r.status, brut.decode(r.headers.get_content_charset() or "latin-1", "replace")
     except urllib.error.HTTPError as e:
         return e.code, ""
 

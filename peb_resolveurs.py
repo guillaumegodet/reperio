@@ -3,7 +3,7 @@
 peb_resolveurs.py — Phase 3 : interroger les résolveurs de liens des BU prioritaires.
 
 La table resolveurs.csv décrit chaque BU : type de résolveur, hôte, code institution.
-Seuls les résolveurs Alma publics (statut « actif ») sont interrogés pour l'instant.
+Sont interrogés les résolveurs Alma et SFX publics (statut « actif »).
 Le type « hlm » (Nantes) n'est pas un résolveur : il renvoie à l'index local de peb_nantes.py.
 
 Usage :
@@ -12,6 +12,9 @@ Usage :
 
 Requête Alma (OpenURL, réponse XML) :
     https://{hote}.alma.exlibrisgroup.com/view/uresolver/{institution}/openurl?rft.issn=...&rft.year=...&svc_dat=CTO
+Requête SFX (OpenURL, réponse XML ; la colonne « hote » porte l'adresse du résolveur) :
+    {hote}?rft.issn=...&rft.year=...&sfx.response_type=simplexml
+    SFX filtre lui-même les services sur l'année (seuil de dates), mais ne publie pas la couverture.
 """
 import argparse, csv, datetime, os, re, sys, urllib.parse
 import xml.etree.ElementTree as ET
@@ -55,14 +58,23 @@ def url_alma(conf, issn, annee):
             + urllib.parse.urlencode(params))
 
 
+def url_sfx(conf, issn, annee):
+    params = {"url_ver": "Z39.88-2004", "ctx_ver": "Z39.88-2004", "rft.genre": "journal",
+              "rft.issn": issn, "rft.year": annee, "rft.date": annee, "sfx.response_type": "simplexml"}
+    return conf["hote"] + "?" + urllib.parse.urlencode(params)
+
+
+URL = {"alma": url_alma, "sfx": url_sfx}
+
+
 def actifs(config=None):
-    return [c for c in (config or charger_config()) if c["type"] == "alma" and c["statut"] == "actif"]
+    return [c for c in (config or charger_config()) if c["type"] in URL and c["statut"] == "actif"]
 
 
 def urls(issns, annee, config=None):
     """Toutes les requêtes que fera interroger() : la page web et la ligne de commande les
     téléchargent en parallèle avant (un résolveur partagé par plusieurs BU n'est compté qu'une fois)."""
-    return list(dict.fromkeys(url_alma(c, i, annee) for c in actifs(config) for i in issns))
+    return list(dict.fromkeys(URL[c["type"]](c, i, annee) for c in actifs(config) for i in issns))
 
 
 def alma(conf, issn, annee):
@@ -104,6 +116,54 @@ def alma(conf, issn, annee):
     return services
 
 
+LIBRE_SFX = re.compile(r"DOAJ|ROAD|FREE|OPEN.?ACCESS|LIBRE|GRATUIT", re.I)
+DOUTE_SFX = re.compile(r"non renouvel|résili|arrêt", re.I)
+
+
+def _reparer_utf8(txt):
+    """SFX envoie de l'UTF-8 en l'annonçant ISO-8859-1 : le navigateur le décode mal
+    (« renouvelÃ© »). Sans effet sur un texte déjà correct."""
+    try:
+        return txt.encode("latin-1").decode("utf-8")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return txt
+
+
+def sfx(conf, issn, annee):
+    """Services texte intégral que SFX donne pour l'année (même format qu'alma()), ou None."""
+    try:
+        txt = get(url_sfx(conf, issn, annee))
+    except RuntimeError:
+        return None
+    if not txt:
+        return None
+    try:
+        root = ET.fromstring(_reparer_utf8(txt))
+    except ET.ParseError:
+        return None
+    services = []
+    for t in root.iterfind("targets/target"):
+        if t.findtext("service_type") != "getFullTxt":
+            continue
+        nom, public = t.findtext("target_name") or "", t.findtext("target_public_name") or ""
+        note = _nettoyer(t.findtext("note"))
+        services.append({
+            "paquet": public or nom,
+            "couverture": "",
+            "couvre_annee": True,          # SFX n'a renvoyé que les services qui couvrent l'année
+            "raison_filtre": "",
+            "libre": bool(LIBRE_SFX.search(nom + " " + public)),
+            "licence": False,
+            "note": note,
+            "doute": bool(DOUTE_SFX.search(note)),   # ex. « Abonnement non renouvelé en 2023 »
+            "url": (t.findtext("target_url") or "").strip(),
+        })
+    return services
+
+
+INTERROGER = {"alma": alma, "sfx": sfx}
+
+
 def lien_catalogue(conf, issn):
     """Recherche par ISSN dans le catalogue public de la BU (colonne « catalogue » de resolveurs.csv).
     Les liens du résolveur passent par le proxy et le CAS de l'établissement : inutilisables
@@ -113,12 +173,12 @@ def lien_catalogue(conf, issn):
 
 
 def a_consulter(issn, config=None):
-    """Catalogues sans résolveur interrogeable (EBSCO Publication Finder, Summon, SebinaYOU…) :
+    """Catalogues sans résolveur interrogeable (EBSCO Publication Finder, Summon, SFX…) :
     liens de recherche par ISSN à ouvrir à la main, dans l'ordre de consultation de l'équipe PEB
     (colonne ordre_peb), puis les autres BU prioritaires qui ont un lien."""
     vus, liens = set(), []
     for conf in config or charger_config():
-        if conf["type"] in ("alma", "hlm") and conf["statut"] == "actif" or not (conf.get("catalogue") or "").strip():
+        if conf["statut"] == "actif" or not (conf.get("catalogue") or "").strip():
             continue
         url = lien_catalogue(conf, issn)
         if url in vus:          # Lyon 1 : deux RCR, un seul catalogue
@@ -141,13 +201,13 @@ def interroger(libelle, issns, annee, config=None):
             ok, txt = peb_nantes.etat()
             etat[cle] = "interrogé" if ok else txt
             continue
-        if conf["type"] != "alma" or conf["statut"] != "actif":
+        if conf["type"] not in INTERROGER or conf["statut"] != "actif":
             etat[cle] = conf["statut"]
             continue
         cle_res = (conf["hote"], conf["institution"])
         services, repondu = [], False
         for issn in issns:
-            r = alma(conf, issn, annee)
+            r = INTERROGER[conf["type"]](conf, issn, annee)
             if r is not None:
                 repondu = True
                 services += [dict(s, issn=issn) for s in r]
@@ -162,18 +222,23 @@ def interroger(libelle, issns, annee, config=None):
                 couvrants.setdefault(s["paquet"], s)
         if couvrants:
             ss = list(couvrants.values())
+            notes = [s["note"] for s in ss if s.get("doute")]
+            nom_res = (f"résolveur Alma {conf['institution']}" if conf["type"] == "alma"
+                       else f"résolveur SFX {conf['etablissement']}")
             lignes.append({
                 "demande": libelle, "annee": annee,
                 "statut": "libre accès" if all(s["libre"] for s in ss) else "oui (accès en ligne)",
-                "confiance": "haute",
+                "confiance": "moyenne" if notes and len(notes) == len(ss) else "haute",
                 "bibliotheque": conf["etablissement"] + (f" ({conf['bibliotheque']})" if conf["rcr"] else ""),
                 "type": "BU", "rcr": conf["rcr"],
                 "prioritaire": "oui" if conf.get("prioritaire", "oui") == "oui" else "",
                 "support": "électronique",
-                "couverture": " | ".join(dict.fromkeys(s["couverture"] for s in ss)),
+                "couverture": " | ".join(dict.fromkeys(s["couverture"] for s in ss if s["couverture"]))
+                              or "année couverte selon le résolveur",
                 "peb": "clause PEB à vérifier" + (" (licence enregistrée)" if any(s["licence"] for s in ss) else ""),
-                "source": f"résolveur Alma {conf['institution']}",
-                "detail": " ; ".join(couvrants) + (" — même résolveur qu'une autre BU" if cle_res in deja else ""),
+                "source": nom_res,
+                "detail": " ; ".join(couvrants) + (f" ({' ; '.join(dict.fromkeys(notes))})" if notes else "")
+                          + (" — même résolveur qu'une autre BU" if cle_res in deja else ""),
                 "url": lien_catalogue(conf, ss[0]["issn"]) or ss[0]["url"],
             })
         deja.add(cle_res)
@@ -187,13 +252,13 @@ def tester():
             _, txt = peb_nantes.etat()      # index local : son absence (ex. en CI) n'est pas un échec
             print(f"  {conf['rcr']} {conf['etablissement']:<40} {'index local':<16} {txt}")
             continue
-        if conf["type"] != "alma" or conf["statut"] != "actif":
+        if conf["type"] not in INTERROGER or conf["statut"] != "actif":
             print(f"  {conf['rcr']} {conf['etablissement']:<40} {conf['statut']}")
             continue
-        r = alma(conf, TEST_ISSN, TEST_ANNEE)
+        r = INTERROGER[conf["type"]](conf, TEST_ISSN, TEST_ANNEE)
         msg = "OK" if r else ("répond mais aucun service" if r == [] else "ÉCHEC")
         ok &= bool(r)
-        print(f"  {conf['rcr']} {conf['etablissement']:<40} {conf['institution']:<16} {msg}")
+        print(f"  {conf['rcr']} {conf['etablissement']:<40} {conf['institution'] or conf['type'].upper():<16} {msg}")
     return ok
 
 

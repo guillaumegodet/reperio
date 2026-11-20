@@ -121,7 +121,7 @@ def rapport_html(resultats, chemin):
              f"<meta name='viewport' content='width=device-width,initial-scale=1'><title>Repério</title>"
              f"<style>{CSS}</style></head><body><main><h1>Repério — localisations pour le PEB</h1>"
              f"<p class='sous'>Généré le {datetime.datetime.now():%d/%m/%Y à %H:%M} · sources : {_e(peb_nantes.etat()[1])}, Sudoc, "
-             f"résolveurs Alma des BU prioritaires, OpenAlex, BACON, ISTEX. "
+             f"résolveurs Alma et SFX, OpenAlex, BACON, ISTEX. "
              f"Bordure bleue = BU prioritaire. Confiance : <b>haute</b> = état fermé ou résolveur à jour ; "
              f"<b>moyenne</b> = état ouvert à confirmer ; <b>faible</b> = douteux.</p>"]
     for r in resultats:
@@ -176,10 +176,10 @@ def rapport_html(resultats, chemin):
             parts.append("</tbody></table></div></details>")
         manuels = r.get("a_consulter") or []
         if manuels:
-            noms = {"ebsco": "EBSCO", "summon": "Summon", "sebina": "SebinaYOU"}
+            noms = {"ebsco": "EBSCO", "summon": "Summon", "sfx": "SFX"}
             parts.append(f"<details><summary>Catalogues à consulter à la main ({len(manuels)})</summary>"
                          "<p class='muted'>Pas de résolveur interrogeable : le lien ouvre le catalogue, "
-                         "recherche par ISSN déjà remplie quand le catalogue le permet.</p><ul>")
+                         "recherche par ISSN déjà remplie.</p><ul>")
             for m in manuels:
                 parts.append(f"<li><a href='{_e(m['url'])}' target='_blank' rel='noopener'>{_e(m['etablissement'])}</a>"
                              f" <span class='muted'>{_e(noms.get(m['systeme'], ''))}</span></li>")

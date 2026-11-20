@@ -12,7 +12,7 @@ Repério (*repérer* + *périodique*) est une preuve de concept. Elle répond à
 0. **Fonds de Nantes Université (étape 0).** Elle vérifie d'abord si Nantes Université donne déjà accès à l'année demandée (abonnement, archives, Licence nationale activée, bouquet libre), d'après l'export du catalogue Nantilus. Si oui, pas de PEB.
 1. **Accès sans PEB (phase 2).** Elle cherche si l'année est en libre accès (OpenAlex, DOAJ, et Mir@bel plateforme par plateforme pour les revues de SHS), couverte par une Licence nationale (BACON) ou présente dans ISTEX.
 2. **Sudoc (phase 1).** Elle lit les états de collection papier et électronique déclarés dans le Sudoc.
-3. **Résolveurs (phase 3).** Elle interroge les résolveurs de liens des BU prioritaires.
+3. **Résolveurs (phase 3).** Elle interroge les résolveurs de liens publics des BU (Alma et SFX).
 
 ## Lancer
 
@@ -64,7 +64,7 @@ Mettre à jour l'index pour les collègues : `python peb_nantes.py --indexer <no
 | `peb_nantes.py` | Fonds électroniques de Nantes Université, d'après l'export HLM du catalogue Nantilus |
 | `peb_sudoc.py` | Sudoc : états de collection, liens entre supports et titres, codes PEB de la zone 930 $j |
 | `peb_acces.py` | Libre accès, Licences nationales, ISTEX |
-| `peb_resolveurs.py` | Résolveurs Alma des BU prioritaires |
+| `peb_resolveurs.py` | Résolveurs Alma et SFX, liens des catalogues à consulter à la main |
 | `web/` | Page de test (GitHub Pages) : interface, worker Pyodide |
 | `logo/` | Logo (SVG fixes, animé, favicon) et `generer_logo.py` qui les régénère |
 | `recensement_bu.csv` | Recensement des 81 services documentaires de l'ESR : système, catalogue, code Alma |
@@ -111,7 +111,7 @@ python peb_resolveurs.py --test
 
 Les liens ouvrent des pages publiques, sans connexion : la recherche par ISSN dans le catalogue de la BU (Primo pour les résolveurs Alma, Nantilus pour Nantes), la notice du Sudoc, le site de l'éditeur, ISTEX ou Mir@bel. Les liens fournis par les résolveurs passent par le proxy et le CAS de chaque établissement : ils ne servent pas à un collègue extérieur. Les adresses des catalogues sont dans la colonne `catalogue` de `resolveurs.csv`, avec `{issn}` à la place de l'ISSN.
 
-Le rapport se termine par la rubrique « Catalogues à consulter à la main » : les établissements sans résolveur interrogeable, avec un lien vers leur catalogue où la recherche par ISSN est déjà remplie quand c'est possible (EBSCO Publication Finder, Summon). Ils sont classés dans l'ordre de consultation de l'équipe PEB (colonne `ordre_peb`, voir plus bas).
+Le rapport se termine par la rubrique « Catalogues à consulter à la main » : les établissements sans résolveur interrogeable, avec un lien vers leur catalogue où la recherche par ISSN est déjà remplie (EBSCO Publication Finder, Summon). Ils sont classés dans l'ordre de consultation de l'équipe PEB (colonne `ordre_peb`, voir plus bas).
 
 ### Niveaux de confiance
 
@@ -167,7 +167,7 @@ Le 19/11/2026, l'équipe PEB a transmis les 18 catalogues qu'elle ouvre en prior
 
 | Rang | Établissement | Dans Repério |
 | --- | --- | --- |
-| 1 | Université d'Angers | lien vers le site de la BU (outil de recherche non identifié) |
+| 1 | Université d'Angers | résolveur SFX hébergé `sfxangers`, ajouté ; lien vers la recherche du site de la BU |
 | 2 | Université de Caen Normandie | résolveur Alma `33PNU_UDC_INST` (eu01), ajouté |
 | 3 | Université Grenoble Alpes | résolveur Alma `33UGRENOBLE_INST` |
 | 4 | Université de Lille | résolveur Alma `33UDLILLE_INST` |
@@ -176,7 +176,7 @@ Le 19/11/2026, l'équipe PEB a transmis les 18 catalogues qu'elle ouvre en prior
 | 7 | Université de Reims Champagne-Ardenne | lien EBSCO Publication Finder |
 | 8 | Université de Rennes | lien EBSCO Publication Finder |
 | 9 | Université Paris-Saclay | résolveur Alma `33PUP_INST` (eu03), ajouté |
-| 10 | Université de Strasbourg | lien vers le catalogue SebinaYOU (« En ligne : Unistra »), sans ISSN prérempli |
+| 10 | Université de Strasbourg | résolveur SFX `bu-sfx.app.unistra.fr`, ajouté ; lien vers la liste A-Z SFX |
 | 11 | Université de Tours | lien Summon |
 | 12 | Université de Franche-Comté | résolveur Alma `33UFC_INST` |
 | 13 | Université Bordeaux Montaigne | résolveur Alma `33PUDB_UBM` (eu02), ajouté |
@@ -189,6 +189,8 @@ Le 19/11/2026, l'équipe PEB a transmis les 18 catalogues qu'elle ouvre en prior
 Le résolveur `33PUP_INST` sert tout le réseau Paris-Saclay (Versailles Saint-Quentin compris) ; `33TOULOUSE_INST` sert tout le réseau Archipel. Les liens vers les catalogues reprennent les vues utilisées par l'équipe PEB.
 
 EBSCO Publication Finder et Summon s'affichent sans connexion, mais n'offrent pas de résolveur public : Repério ne les interroge pas.
+
+Les résolveurs SFX (type `sfx`, adresse du résolveur dans la colonne `hote`) répondent en XML avec `sfx.response_type=simplexml` et autorisent les requêtes de la page web (CORS). SFX ne renvoie que les services qui couvrent l'année demandée, mais ne publie pas la couverture : la colonne Couverture indique « année couverte selon le résolveur ». Une note du type « Abonnement non renouvelé » fait passer la confiance à moyenne, la base SFX n'étant pas toujours mise à jour.
 
 ## Autres établissements de l'enseignement supérieur
 
@@ -207,7 +209,7 @@ Recensement du 14/11/2026, à partir du jeu [Bibliothèques de l'Enseignement su
 Établissements ajoutés : Le Havre, Grenoble Alpes, Paris-Est Créteil, Littoral Côte d'Opale, Poitiers, Sorbonne Nouvelle, Collège de France, Pau et Pays de l'Adour, Antilles, Bibliothèque Cujas, Toulon. 
 Le détail par service documentaire est dans `recensement_bu.csv` (système repéré, catalogue, code et serveur Alma) : c'est la liste de travail pour compléter `resolveurs.csv`.
 
-Les 23 résolveurs (24 lignes) sont interrogés en parallèle (8 requêtes à la fois) : une recherche ne prend pas plus de temps qu'avec 7.
+Les 25 résolveurs (26 lignes) sont interrogés en parallèle (8 requêtes à la fois) : une recherche ne prend pas plus de temps qu'avec 7.
 
 ## Limites connues
 
