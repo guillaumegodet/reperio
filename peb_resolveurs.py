@@ -3,7 +3,9 @@
 peb_resolveurs.py — Phase 3 : interroger les résolveurs de liens des BU prioritaires.
 
 La table resolveurs.csv décrit chaque BU : type de résolveur, hôte, code institution.
-Sont interrogés les résolveurs Alma et SFX publics (statut « actif »).
+Sont interrogés les résolveurs Alma, SFX et 360 Link publics (statut « actif »).
+360 Link ne répond qu'en HTTP, sans en-têtes CORS : il n'est interrogé qu'en ligne de commande ;
+dans la page web, ses BU passent dans les catalogues à consulter à la main.
 Le type « hlm » (Nantes) n'est pas un résolveur : il renvoie à l'index local de peb_nantes.py.
 
 Usage :
@@ -15,6 +17,8 @@ Requête Alma (OpenURL, réponse XML) :
 Requête SFX (OpenURL, réponse XML ; la colonne « hote » porte l'adresse du résolveur) :
     {hote}?rft.issn=...&rft.year=...&sfx.response_type=simplexml
     SFX filtre lui-même les services sur l'année (seuil de dates), mais ne publie pas la couverture.
+Requête 360 Link (API XML ; la colonne « hote » porte le code client, ex. sh2hh6qx2e) :
+    http://{hote}.openurl.xml.serialssolutions.com/openurlxml?version=1.0&genre=journal&issn=...&date=...
 """
 import argparse, csv, datetime, os, re, sys, urllib.parse
 import xml.etree.ElementTree as ET
@@ -25,6 +29,8 @@ ICI = os.path.dirname(os.path.abspath(__file__))
 CONFIG = os.path.join(ICI, "resolveurs.csv")
 NS = {"u": "http://com/exlibris/urm/uresolver/xmlbeans/u"}
 TEST_ISSN, TEST_ANNEE = "0002-9343", 2020      # American Journal of Medicine, très largement souscrit
+NS360 = {"s": "http://xml.serialssolutions.com/ns/openurl/v1.0"}
+NAVIGATEUR = sys.platform == "emscripten"       # Pyodide : la page web ne peut pas joindre 360 Link
 
 
 def charger_config(chemin=CONFIG):
@@ -64,11 +70,21 @@ def url_sfx(conf, issn, annee):
     return conf["hote"] + "?" + urllib.parse.urlencode(params)
 
 
-URL = {"alma": url_alma, "sfx": url_sfx}
+def url_360(conf, issn, annee):
+    params = {"version": "1.0", "genre": "journal", "issn": issn, "date": annee}
+    return f"http://{conf['hote']}.openurl.xml.serialssolutions.com/openurlxml?" + urllib.parse.urlencode(params)
+
+
+URL = {"alma": url_alma, "sfx": url_sfx, "360link": url_360}
+
+
+def interrogeable(conf):
+    return (conf["type"] in URL and conf["statut"] == "actif"
+            and not (NAVIGATEUR and conf["type"] == "360link"))
 
 
 def actifs(config=None):
-    return [c for c in (config or charger_config()) if c["type"] in URL and c["statut"] == "actif"]
+    return [c for c in (config or charger_config()) if interrogeable(c)]
 
 
 def urls(issns, annee, config=None):
@@ -161,7 +177,55 @@ def sfx(conf, issn, annee):
     return services
 
 
-INTERROGER = {"alma": alma, "sfx": sfx}
+LIBRE_360 = re.compile(r"DOAJ|Directory of Open Access|Open Access|Free|libre|gratuit", re.I)
+AGREGATEUR_360 = re.compile(r"EBSCOhost|ProQuest|Gale", re.I)   # bases d'agrégateurs : articles parfois absents
+
+
+def lien360(conf, issn, annee):
+    """Bouquets 360 Link qui couvrent l'année (même format qu'alma()), ou None.
+    Les fonds papier (« Library Specific Holdings », sans dates) sont laissés au Sudoc."""
+    try:
+        txt = get(url_360(conf, issn, annee))
+    except RuntimeError:
+        return None
+    if not txt:
+        return None
+    try:
+        root = ET.fromstring(txt)
+    except ET.ParseError:
+        return None
+    services = []
+    for g in root.iterfind(".//s:linkGroup[@type='holding']", NS360):
+        h = g.find("s:holdingData", NS360)
+        if h is None or h.findtext("s:providerId", "", NS360) == "PRVLSH":
+            continue
+        debut = h.findtext("s:normalizedData/s:startDate", "", NS360)
+        fin = h.findtext("s:normalizedData/s:endDate", "", NS360)
+        if not debut:
+            continue
+        a = int(annee)
+        couvre_annee = int(debut[:4]) <= a and (not fin or a <= int(fin[:4]))
+        partiel = debut[:4] == str(a) and debut[5:] != "01-01" or fin[:4] == str(a) and fin[5:] != "12-31"
+        nom = h.findtext("s:databaseName", "", NS360)
+        agregateur = bool(AGREGATEUR_360.search(h.findtext("s:providerName", "", NS360)))
+        notes = (["agrégateur, articles parfois absents"] if agregateur else []) + \
+                ([f"année {a} couverte en partie"] if partiel else [])
+        url = g.findtext("s:url[@type='journal']", "", NS360) or g.findtext("s:url[@type='source']", "", NS360)
+        services.append({
+            "paquet": nom or h.findtext("s:providerName", "", NS360),
+            "couverture": f"{debut[:4]}–{fin[:4]}" if fin else f"depuis {debut[:4]}",
+            "couvre_annee": couvre_annee,
+            "raison_filtre": "",
+            "libre": bool(LIBRE_360.search(nom)),
+            "licence": False,
+            "note": ", ".join(notes),
+            "doute": bool(notes),
+            "url": url.strip(),
+        })
+    return services
+
+
+INTERROGER = {"alma": alma, "sfx": sfx, "360link": lien360}
 
 
 def lien_catalogue(conf, issn):
@@ -178,7 +242,7 @@ def a_consulter(issn, config=None):
     (colonne ordre_peb), puis les autres BU prioritaires qui ont un lien."""
     vus, liens = set(), []
     for conf in config or charger_config():
-        if conf["statut"] == "actif" or not (conf.get("catalogue") or "").strip():
+        if conf["type"] == "hlm" or interrogeable(conf) or not (conf.get("catalogue") or "").strip():
             continue
         url = lien_catalogue(conf, issn)
         if url in vus:          # Lyon 1 : deux RCR, un seul catalogue
@@ -201,8 +265,8 @@ def interroger(libelle, issns, annee, config=None):
             ok, txt = peb_nantes.etat()
             etat[cle] = "interrogé" if ok else txt
             continue
-        if conf["type"] not in INTERROGER or conf["statut"] != "actif":
-            etat[cle] = conf["statut"]
+        if not interrogeable(conf):
+            etat[cle] = "lien seulement (page web)" if conf["statut"] == "actif" else conf["statut"]
             continue
         cle_res = (conf["hote"], conf["institution"])
         services, repondu = [], False
@@ -224,7 +288,7 @@ def interroger(libelle, issns, annee, config=None):
             ss = list(couvrants.values())
             notes = [s["note"] for s in ss if s.get("doute")]
             nom_res = (f"résolveur Alma {conf['institution']}" if conf["type"] == "alma"
-                       else f"résolveur SFX {conf['etablissement']}")
+                       else f"résolveur {'SFX' if conf['type'] == 'sfx' else '360 Link'} {conf['etablissement']}")
             lignes.append({
                 "demande": libelle, "annee": annee,
                 "statut": "libre accès" if all(s["libre"] for s in ss) else "oui (accès en ligne)",
@@ -252,7 +316,7 @@ def tester():
             _, txt = peb_nantes.etat()      # index local : son absence (ex. en CI) n'est pas un échec
             print(f"  {conf['rcr']} {conf['etablissement']:<40} {'index local':<16} {txt}")
             continue
-        if conf["type"] not in INTERROGER or conf["statut"] != "actif":
+        if not interrogeable(conf):
             print(f"  {conf['rcr']} {conf['etablissement']:<40} {conf['statut']}")
             continue
         r = INTERROGER[conf["type"]](conf, TEST_ISSN, TEST_ANNEE)

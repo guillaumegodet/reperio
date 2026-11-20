@@ -12,7 +12,7 @@ Repério (*repérer* + *périodique*) est une preuve de concept. Elle répond à
 0. **Fonds de Nantes Université (étape 0).** Elle vérifie d'abord si Nantes Université donne déjà accès à l'année demandée (abonnement, archives, Licence nationale activée, bouquet libre), d'après l'export du catalogue Nantilus. Si oui, pas de PEB.
 1. **Accès sans PEB (phase 2).** Elle cherche si l'année est en libre accès (OpenAlex, DOAJ, et Mir@bel plateforme par plateforme pour les revues de SHS), couverte par une Licence nationale (BACON) ou présente dans ISTEX.
 2. **Sudoc (phase 1).** Elle lit les états de collection papier et électronique déclarés dans le Sudoc.
-3. **Résolveurs (phase 3).** Elle interroge les résolveurs de liens publics des BU (Alma et SFX).
+3. **Résolveurs (phase 3).** Elle interroge les résolveurs de liens publics des BU (Alma, SFX et, en ligne de commande, 360 Link).
 
 ## Lancer
 
@@ -64,7 +64,7 @@ Mettre à jour l'index pour les collègues : `python peb_nantes.py --indexer <no
 | `peb_nantes.py` | Fonds électroniques de Nantes Université, d'après l'export HLM du catalogue Nantilus |
 | `peb_sudoc.py` | Sudoc : états de collection, liens entre supports et titres, codes PEB de la zone 930 $j |
 | `peb_acces.py` | Libre accès, Licences nationales, ISTEX |
-| `peb_resolveurs.py` | Résolveurs Alma et SFX, liens des catalogues à consulter à la main |
+| `peb_resolveurs.py` | Résolveurs Alma, SFX et 360 Link, liens des catalogues à consulter à la main |
 | `web/` | Page de test (GitHub Pages) : interface, worker Pyodide |
 | `logo/` | Logo (SVG fixes, animé, favicon) et `generer_logo.py` qui les régénère |
 | `recensement_bu.csv` | Recensement des 81 services documentaires de l'ESR : système, catalogue, code Alma |
@@ -177,18 +177,20 @@ Le 19/11/2026, l'équipe PEB a transmis les 18 catalogues qu'elle ouvre en prior
 | 8 | Université de Rennes | lien EBSCO Publication Finder |
 | 9 | Université Paris-Saclay | résolveur Alma `33PUP_INST` (eu03), ajouté |
 | 10 | Université de Strasbourg | résolveur SFX `bu-sfx.app.unistra.fr`, ajouté ; lien vers la liste A-Z SFX |
-| 11 | Université de Tours | lien Summon |
+| 11 | Université de Tours | résolveur 360 Link `wk6sd9xc7e` (ligne de commande), ajouté ; lien Summon |
 | 12 | Université de Franche-Comté | résolveur Alma `33UFC_INST` |
 | 13 | Université Bordeaux Montaigne | résolveur Alma `33PUDB_UBM` (eu02), ajouté |
 | 14 | Université Clermont Auvergne (BCIU) | résolveur Alma `33CLERMONT_BCIU` (eu02), ajouté |
 | 15 | Université de Limoges | lien EBSCO Publication Finder |
-| 16 | Aix-Marseille Université | lien Summon |
+| 16 | Aix-Marseille Université | résolveur 360 Link `sh2hh6qx2e` (ligne de commande), ajouté ; lien Summon |
 | 17 | Université de Montpellier | résolveur Alma `33MON_INST` |
 | 18 | Université de Toulouse (réseau Archipel) | résolveur Alma `33TOULOUSE_INST` (eu02), ajouté |
 
 Le résolveur `33PUP_INST` sert tout le réseau Paris-Saclay (Versailles Saint-Quentin compris) ; `33TOULOUSE_INST` sert tout le réseau Archipel. Les liens vers les catalogues reprennent les vues utilisées par l'équipe PEB.
 
-EBSCO Publication Finder et Summon s'affichent sans connexion, mais n'offrent pas de résolveur public : Repério ne les interroge pas.
+EBSCO Publication Finder s'affiche sans connexion, mais son résolveur (Full Text Finder) passe par une connexion EBSCO et n'offre pas de réponse publique exploitable : Repério ne l'interroge pas.
+
+Derrière Summon, Tours et Aix-Marseille ont le résolveur 360 Link (type `360link`, code client dans la colonne `hote`, trouvé dans la configuration publique de Summon, `/custom_data`). Son API XML donne les bouquets et leurs dates de couverture ; Repério contrôle lui-même l'année. Les fonds papier (« Library Specific Holdings ») sont laissés au Sudoc ; les bases d'agrégateurs (EBSCOhost, ProQuest, Gale) et les années couvertes en partie passent en confiance moyenne. Cette API ne répond qu'en HTTP, sans en-têtes CORS : elle n'est interrogée qu'en ligne de commande. Dans la page web, Tours et Aix-Marseille restent dans les catalogues à consulter à la main.
 
 Les résolveurs SFX (type `sfx`, adresse du résolveur dans la colonne `hote`) répondent en XML avec `sfx.response_type=simplexml` et autorisent les requêtes de la page web (CORS). SFX ne renvoie que les services qui couvrent l'année demandée, mais ne publie pas la couverture : la colonne Couverture indique « année couverte selon le résolveur ». Une note du type « Abonnement non renouvelé » fait passer la confiance à moyenne, la base SFX n'étant pas toujours mise à jour.
 
@@ -209,7 +211,7 @@ Recensement du 14/11/2026, à partir du jeu [Bibliothèques de l'Enseignement su
 Établissements ajoutés : Le Havre, Grenoble Alpes, Paris-Est Créteil, Littoral Côte d'Opale, Poitiers, Sorbonne Nouvelle, Collège de France, Pau et Pays de l'Adour, Antilles, Bibliothèque Cujas, Toulon. 
 Le détail par service documentaire est dans `recensement_bu.csv` (système repéré, catalogue, code et serveur Alma) : c'est la liste de travail pour compléter `resolveurs.csv`.
 
-Les 25 résolveurs (26 lignes) sont interrogés en parallèle (8 requêtes à la fois) : une recherche ne prend pas plus de temps qu'avec 7.
+Les 27 résolveurs (28 lignes, 26 dans la page web) sont interrogés en parallèle (8 requêtes à la fois) : une recherche ne prend pas plus de temps qu'avec 7.
 
 ## Limites connues
 

@@ -121,7 +121,7 @@ def rapport_html(resultats, chemin):
              f"<meta name='viewport' content='width=device-width,initial-scale=1'><title>Repério</title>"
              f"<style>{CSS}</style></head><body><main><h1>Repério — localisations pour le PEB</h1>"
              f"<p class='sous'>Généré le {datetime.datetime.now():%d/%m/%Y à %H:%M} · sources : {_e(peb_nantes.etat()[1])}, Sudoc, "
-             f"résolveurs Alma et SFX, OpenAlex, BACON, ISTEX. "
+             f"résolveurs Alma, SFX et 360 Link, OpenAlex, BACON, ISTEX. "
              f"Bordure bleue = BU prioritaire. Confiance : <b>haute</b> = état fermé ou résolveur à jour ; "
              f"<b>moyenne</b> = état ouvert à confirmer ; <b>faible</b> = douteux.</p>"]
     for r in resultats:
